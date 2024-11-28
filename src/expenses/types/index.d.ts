@@ -1,10 +1,13 @@
-import { Expenses, PrismaClient } from "@prisma/client";
 import { ExpensesDto } from "../models/index.model";
-import { HttpError } from "../../utils/httpError";
 
-interface IGetExpensesProps extends ExpensesFindManyArgs { }
+export interface IGetExpensesProps {
+  where?: object;
+  orderBy?: object;
+  skip?: number;
+  take?: number;
+}
 
-export type TGetExpenses = (IGetExpensesProps) => Promise<ExpensesDto[]>;
+export type TGetExpenses = (props: IGetExpensesProps) => Promise<ExpensesDto[]>;
 
 interface IGetExpenseByIdProps {
   id: number;

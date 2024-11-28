@@ -1,6 +1,6 @@
 import assert from "assert";
 import { ExpensesRepository } from "../repository/index.repository";
-import { TCreateExpense, TGetExpenseById, TGetExpenses } from "../types";
+import { IGetExpensesProps, TCreateExpense, TGetExpenseById, TGetExpenses } from "../types";
 import { IExpensesService, IExpensesServiceConstructor } from "./types";
 import { ExpensesDto } from "../models/index.model";
 import { HttpError } from "../../utils/httpError";
@@ -12,7 +12,7 @@ export class ExpensesService implements IExpensesService {
     this.expensesRepository = expensesRepository;
   }
 
-  getExpenses: TGetExpenses = async (getExpensesArgs) => {
+  getExpenses: TGetExpenses = async (getExpensesArgs: IGetExpensesProps) => {
     let getExpenseOptions = {};
 
     if (getExpensesArgs) {

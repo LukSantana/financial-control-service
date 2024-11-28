@@ -3,6 +3,7 @@ import { ExpensesService } from '../service/index.service';
 import { ExpensesDto } from '../models/index.model';
 import logger from '../../utils/logger';
 import { ExceptionHandler } from '../../utils/exceptionHandler';
+import { HttpError } from 'src/utils/httpError';
 
 export class ExpensesController {
   constructor(
@@ -30,10 +31,13 @@ export class ExpensesController {
 
       logger.info('GET Expenses - Request finished successfully')
       return res.json(expenses.map((expense) => expense.exportToResponse()));
-    } catch (error: any) {
-      logger.error(`GET Expenses - Error: ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof HttpError) {
+        logger.error(`GET Expenses - Error: ${error.message}`);
+        return this.exceptionHandler.handle(error, res);
+      }
 
-      return this.exceptionHandler.handle(error, res);
+      return this.exceptionHandler.handle(undefined, res);
     }
   }
 
@@ -48,10 +52,14 @@ export class ExpensesController {
 
       logger.info(`GET Expenses/:id - Request finished successfully. Expense ID: ${expense.id}`)
       return res.json(expense.exportToResponse());
-    } catch (error: any) {
-      logger.error(`GET Expenses/:id - Error: ${error.message}`);
+    } catch (error: unknown) {
+      if (error instanceof HttpError) {
+        logger.error(`GET Expenses/:id - Error: ${error.message}`);
 
-      return this.exceptionHandler.handle(error, res);
+        return this.exceptionHandler.handle(error, res);
+      }
+
+      return this.exceptionHandler.handle(undefined, res);
     }
   }
 
@@ -66,10 +74,14 @@ export class ExpensesController {
 
       logger.info(`POST Expenses - Expense created: ${expense.id}`);
       return res.status(201).json(expense.exportToResponse());
-    } catch (error: any) {
-      logger.error(`POST Expenses - Error: ${error.message}`);
+    } catch (error: unknown | undefined) {
+      if (error instanceof HttpError) {
+        logger.error(`POST Expenses - Error: ${error.message}`);
 
-      return this.exceptionHandler.handle(error, res);
+        return this.exceptionHandler.handle(error, res);
+      }
+
+      return this.exceptionHandler.handle(undefined, res);
     }
   }
 }

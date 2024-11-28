@@ -5,6 +5,8 @@ import airbnbBase from "eslint-config-airbnb-base";
 import importPlugin from "eslint-plugin-import";
 import prettierPlugin from "eslint-plugin-prettier";
 import prettierConfig from "eslint-config-prettier";
+import typescriptEslintParser from "@typescript-eslint/parser";
+import typescriptEslintPlugin from "@typescript-eslint/eslint-plugin";
 
 const { rules } = eslintAll;
 
@@ -23,20 +25,17 @@ export default [
     },
     {
         files: [
-            "src/**/*.js",
-            "database/**/*.js",
-            "config/**/*.js",
+            "src/**/*.ts",
+            "database/**/*.ts",
+            "config/**/*.ts",
         ],
-        languageOptions: { sourceType: "commonjs" },
-    },
-    {
         languageOptions: {
+            parser: typescriptEslintParser,
+            sourceType: "module",
             globals: globals.browser
-        }
-    },
-    pluginJs.configs.recommended,
-    {
+        },
         plugins: {
+            "@typescript-eslint": typescriptEslintPlugin,
             import: importPlugin,
             prettier: prettierPlugin,
         },
@@ -44,12 +43,14 @@ export default [
             ...rules,
             ...airbnbBase.rules,
             ...prettierConfig.rules,
+            ...typescriptEslintPlugin.configs.recommended.rules,
             "max-lines": "off",
             "max-lines-per-function": "off",
             "max-nested-callbacks": "off",
             "max-params": "off",
             "max-statements": "off",
             "max-statements-per-line": "off",
+            "new-cap": "off",
             "no-console": "off",
             "no-inline-comments": "off",
             "no-magic-numbers": "off",
@@ -59,13 +60,16 @@ export default [
             "no-undefined": "off",
             "one-var": "off",
             "require-atomic-updates": "off",
+            "sort-imports": "off",
             "sort-keys": "off",
             "sort-vars": "off",
             "strict": "off",
+            "require-await": "off",
+            "@typescript-eslint/no-explicit-any": ["error", { "ignoreRestArgs": true }],
         }
     },
     {
-        files: ["tests/**/*.js"],
+        files: ["tests/**/*.ts"],
         languageOptions: {
             globals: {
                 afterAll: "readonly",

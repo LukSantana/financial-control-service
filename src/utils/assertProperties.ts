@@ -1,6 +1,6 @@
 import { HttpError } from "./httpError";
 
-export const assertRequiredProperties = (obj: Record<string, any>, properties: string[]) => {
+export const assertRequiredProperties = (obj: Record<string, unknown>, properties: string[]) => {
   const missingProperties = properties.filter(property => !obj[property]);
 
   if (missingProperties.length > 0) {
@@ -12,7 +12,7 @@ export const assertRequiredProperties = (obj: Record<string, any>, properties: s
   }
 }
 
-export const assertExistentProperties = (obj: Record<string, any>, properties: string[]) => {
+export const assertExistentProperties = (obj: Record<string, unknown>, properties: string[]) => {
   const invalidProperties = Object.keys(obj).filter(property => !properties.includes(property));
 
   if (invalidProperties.length > 0) {

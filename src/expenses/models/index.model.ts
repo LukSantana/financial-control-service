@@ -47,7 +47,7 @@ export class ExpensesDto implements Partial<Expenses> {
   responsibleId?: number | null;
 
   validateCreationParameters = (): void => {
-    assertRequiredProperties(this, [
+    assertRequiredProperties(this as Record<string, unknown>, [
       'type',
       'description',
       'amount',
@@ -57,36 +57,32 @@ export class ExpensesDto implements Partial<Expenses> {
     ]);
   }
 
-  getCreationParameters = (): Partial<Expenses> => {
-    return {
-      type: this.type,
-      description: this.description,
-      amount: this.amount,
-      installments: this.installments,
-      paidPercentage: this.paidPercentage,
-      date: this.date,
-      sourceId: this.sourceId,
-      expenseCategoryId: this.expenseCategoryId,
-      expensesSourceId: this.expensesSourceId,
-      responsibleId: this.responsibleId,
-    }
-  }
+  getCreationParameters = (): Partial<Expenses> => ({
+    type: this.type,
+    description: this.description,
+    amount: this.amount,
+    installments: this.installments,
+    paidPercentage: this.paidPercentage,
+    date: this.date,
+    sourceId: this.sourceId,
+    expenseCategoryId: this.expenseCategoryId,
+    expensesSourceId: this.expensesSourceId,
+    responsibleId: this.responsibleId,
+  })
 
-  exportToResponse = (): Partial<Expenses> => {
-    return {
-      id: this.id,
-      type: this.type,
-      description: this.description,
-      amount: this.amount,
-      installments: this.installments,
-      paidPercentage: this.paidPercentage,
-      date: this.date,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
-      sourceId: this.sourceId,
-      expenseCategoryId: this.expenseCategoryId,
-      expensesSourceId: this.expensesSourceId,
-      responsibleId: this.responsibleId,
-    }
-  }
+  exportToResponse = (): Partial<Expenses> => ({
+    id: this.id,
+    type: this.type,
+    description: this.description,
+    amount: this.amount,
+    installments: this.installments,
+    paidPercentage: this.paidPercentage,
+    date: this.date,
+    createdAt: this.createdAt,
+    updatedAt: this.updatedAt,
+    sourceId: this.sourceId,
+    expenseCategoryId: this.expenseCategoryId,
+    expensesSourceId: this.expensesSourceId,
+    responsibleId: this.responsibleId,
+  })
 }
