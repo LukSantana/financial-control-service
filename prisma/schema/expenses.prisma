@@ -3,29 +3,12 @@ enum EExpenseType {
   VARIABLE
 }
 
-model ExpenseCategory {
-  id        Int        @id @default(autoincrement())
-  name      String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  Expenses  Expenses[]
-}
-
 enum EExpenseSubcategory {
   CREDIT_CARD
   BANK_TRANSACTION
   DEBIT_CARD
   CASH
   OTHER
-}
-
-model ExpenseResponsibles {
-  id              Int               @id @default(autoincrement())
-  name            String
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  expenses        Expenses[]
-  AdvancePayments AdvancePayments[]
 }
 
 model Expenses {
@@ -42,7 +25,7 @@ model Expenses {
   expenseCategoryId Int
   expensesSourceId  Int?
   responsibleId     Int?
-  ExpenseCategory   ExpenseCategory      @relation(fields: [expenseCategoryId], references: [id])
+  ExpenseCategory   ExpenseCategories    @relation(fields: [expenseCategoryId], references: [id])
   ExpensesSources   ExpensesSources?     @relation(fields: [expensesSourceId], references: [id])
   Responsibles      ExpenseResponsibles? @relation(fields: [responsibleId], references: [id])
 }

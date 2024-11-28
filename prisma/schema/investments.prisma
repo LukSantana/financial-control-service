@@ -14,22 +14,13 @@ enum EInvestimentCategory {
   OTHER
 }
 
-model InvestimentCategory {
-  id          Int                  @id @default(autoincrement())
-  name        EInvestimentCategory
-  type        EInvestimentType
-  isNational  Boolean
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
-  Investments Investments[]
-}
-
 model Investments {
-  id         Int                 @id @default(autoincrement())
-  amount     Float?
-  shares     Float?
-  createdAt  DateTime            @default(now())
-  updatedAt  DateTime            @updatedAt
-  category   InvestimentCategory @relation(fields: [categoryId], references: [id])
-  categoryId Int
+  id                    Int                   @id @default(autoincrement())
+  amount                Float?
+  shares                Float?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  categoryId            Int
+  investimentCategoryId Int?
+  Category              InvestimentCategories @relation(fields: [categoryId], references: [id])
 }
