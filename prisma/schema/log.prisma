@@ -1,0 +1,9 @@
+model Logs {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  message   String
+  stack     String
+  data      Json?
+  level     String
+}

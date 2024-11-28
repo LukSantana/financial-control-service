@@ -1,0 +1,58 @@
+enum EExpenseType {
+  FIXED
+  VARIABLE
+}
+
+model ExpenseCategory {
+  id        Int        @id @default(autoincrement())
+  name      String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Expenses  Expenses[]
+}
+
+enum EExpenseSubcategory {
+  CREDIT_CARD
+  BANK_TRANSACTION
+  DEBIT_CARD
+  CASH
+  OTHER
+}
+
+model ExpenseResponsibles {
+  id              Int               @id @default(autoincrement())
+  name            String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  expenses        Expenses[]
+  AdvancePayments AdvancePayments[]
+}
+
+model Expenses {
+  id                Int                  @id @default(autoincrement())
+  type              EExpenseType
+  description       String
+  amount            Float
+  installments      Int?
+  paidPercentage    Float?
+  date              DateTime             @default(now())
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  sourceId          Int
+  expenseCategoryId Int
+  expensesSourceId  Int?
+  responsibleId     Int?
+  ExpenseCategory   ExpenseCategory      @relation(fields: [expenseCategoryId], references: [id])
+  ExpensesSources   ExpensesSources?     @relation(fields: [expensesSourceId], references: [id])
+  Responsibles      ExpenseResponsibles? @relation(fields: [responsibleId], references: [id])
+}
+
+model ExpensesSources {
+  id              Int                 @id @default(autoincrement())
+  name            String
+  type            EExpenseSubcategory
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  Expenses        Expenses[]
+  AdvancePayments AdvancePayments[]
+}

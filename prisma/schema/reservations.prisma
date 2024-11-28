@@ -1,0 +1,7 @@
+model Reservations {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  objective String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

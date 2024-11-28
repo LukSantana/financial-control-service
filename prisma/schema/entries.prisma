@@ -1,0 +1,23 @@
+model EntrySource {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Entries   Entries[]
+}
+
+enum EEntryType {
+  FIXED
+  VARIABLE
+}
+
+model Entries {
+  id            Int          @id @default(autoincrement())
+  amount        Float
+  type          EEntryType
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  entriesTypeId Int
+  EntrySource   EntrySource? @relation(fields: [entrySourceId], references: [id])
+  entrySourceId Int?
+}
