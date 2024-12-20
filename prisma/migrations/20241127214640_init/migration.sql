@@ -8,10 +8,10 @@ CREATE TYPE "EExpenseType" AS ENUM ('FIXED', 'VARIABLE');
 CREATE TYPE "EExpenseSubcategory" AS ENUM ('CREDIT_CARD', 'BANK_TRANSACTION', 'DEBIT_CARD', 'CASH', 'OTHER');
 
 -- CreateEnum
-CREATE TYPE "EInvestimentType" AS ENUM ('FIXED', 'VARIABLE');
+CREATE TYPE "EInvestmentType" AS ENUM ('FIXED', 'VARIABLE');
 
 -- CreateEnum
-CREATE TYPE "EInvestimentCategory" AS ENUM ('STOCKS', 'CRYPTO', 'REAL_STATE', 'FIXED_INCOME', 'TREASURY', 'ETF', 'BDR', 'OTHER');
+CREATE TYPE "EInvestmentCategory" AS ENUM ('STOCKS', 'CRYPTO', 'REAL_STATE', 'FIXED_INCOME', 'TREASURY', 'ETF', 'BDR', 'OTHER');
 
 -- CreateTable
 CREATE TABLE "AdvancePayments" (
@@ -99,15 +99,15 @@ CREATE TABLE "ExpensesSources" (
 );
 
 -- CreateTable
-CREATE TABLE "InvestimentCategory" (
+CREATE TABLE "InvestmentCategory" (
     "id" SERIAL NOT NULL,
-    "name" "EInvestimentCategory" NOT NULL,
-    "type" "EInvestimentType" NOT NULL,
+    "name" "EInvestmentCategory" NOT NULL,
+    "type" "EInvestmentType" NOT NULL,
     "isNational" BOOLEAN NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "InvestimentCategory_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "InvestmentCategory_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -165,4 +165,4 @@ ALTER TABLE "Expenses" ADD CONSTRAINT "Expenses_expensesSourcesId_fkey" FOREIGN 
 ALTER TABLE "Expenses" ADD CONSTRAINT "Expenses_responsiblesId_fkey" FOREIGN KEY ("responsiblesId") REFERENCES "ExpenseResponsibles"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Investments" ADD CONSTRAINT "Investments_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "InvestimentCategory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Investments" ADD CONSTRAINT "Investments_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "InvestmentCategory"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

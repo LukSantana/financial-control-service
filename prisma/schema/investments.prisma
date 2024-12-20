@@ -1,9 +1,9 @@
-enum EInvestimentType {
+enum EInvestmentType {
   FIXED
   VARIABLE
 }
 
-enum EInvestimentCategory {
+enum EInvestmentCategory {
   STOCKS
   CRYPTO
   REAL_STATE
@@ -15,12 +15,13 @@ enum EInvestimentCategory {
 }
 
 model Investments {
-  id                    Int                   @id @default(autoincrement())
-  amount                Float?
-  shares                Float?
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
-  categoryId            Int
-  investimentCategoryId Int?
-  Category              InvestimentCategories @relation(fields: [categoryId], references: [id])
+  id                   Int                   @id @default(autoincrement())
+  amount               Float?
+  shares               Float?
+  date                 DateTime?             @default(now())
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  categoryId           Int
+  investmentCategoryId Int?
+  Category             InvestmentsCategories @relation(fields: [categoryId], references: [id])
 }

@@ -1,10 +1,10 @@
 model AdvancePayments {
-  id            Int                  @id @default(autoincrement())
+  id            Int                   @id @default(autoincrement())
   amount        Float
-  responsible   ExpenseResponsibles? @relation(fields: [responsibleId], references: [id])
-  source        ExpensesSources      @relation(fields: [sourceId], references: [id])
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
+  responsible   ExpensesResponsibles? @relation(fields: [responsibleId], references: [id])
+  source        ExpensesSources       @relation(fields: [sourceId], references: [id])
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
   responsibleId Int?
   sourceId      Int
 }

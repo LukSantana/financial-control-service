@@ -1,19 +1,19 @@
-import { PrismaClient } from "@prisma/client";
 import { THandle } from "./types/expection";
 import logger from "./logger";
 import { HttpError } from "./httpError";
+import { LogsRegistry } from "./logsHandling";
 
 export class ExceptionHandler {
   handle: THandle;
-  prismaClient: PrismaClient["logs"];
+  logsRegistry: LogsRegistry;
   genericError: HttpError = new HttpError({
     message: 'Something went wrong',
     status: 500,
     stack: new Error().stack!
   })
 
-  constructor(prismaClient: PrismaClient["logs"]) {
-    this.prismaClient = prismaClient;
+  constructor(logsRegistry: LogsRegistry) {
+    this.logsRegistry = logsRegistry;
 
     this.handle = async (error, res) => {
       let errorObject: HttpError = this.genericError;
@@ -21,11 +21,12 @@ export class ExceptionHandler {
       try {
         if (error) errorObject = error;
 
-        await this.prismaClient.create({
+        logsRegistry.createLog({
+          message: errorObject.message,
+          stack: errorObject.stack || new Error().stack!,
+          level: '50',
           data: {
-            message: errorObject.message,
-            stack: errorObject.stack || new Error().stack!,
-            level: '50'
+            status: errorObject.status
           }
         })
       } catch (err: unknown) {

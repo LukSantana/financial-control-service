@@ -12,30 +12,19 @@ enum EExpenseSubcategory {
 }
 
 model Expenses {
-  id                Int                  @id @default(autoincrement())
+  id                Int                   @id @default(autoincrement())
   type              EExpenseType
   description       String
   amount            Float
   installments      Int?
-  paidPercentage    Float?
-  date              DateTime             @default(now())
-  createdAt         DateTime             @default(now())
-  updatedAt         DateTime             @updatedAt
+  date              DateTime?             @default(now())
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
   sourceId          Int
   expenseCategoryId Int
-  expensesSourceId  Int?
+  expenseSourceId   Int?
   responsibleId     Int?
-  ExpenseCategory   ExpenseCategories    @relation(fields: [expenseCategoryId], references: [id])
-  ExpensesSources   ExpensesSources?     @relation(fields: [expensesSourceId], references: [id])
-  Responsibles      ExpenseResponsibles? @relation(fields: [responsibleId], references: [id])
-}
-
-model ExpensesSources {
-  id              Int                 @id @default(autoincrement())
-  name            String
-  type            EExpenseSubcategory
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
-  Expenses        Expenses[]
-  AdvancePayments AdvancePayments[]
+  ExpenseCategory   ExpensesCategories    @relation(fields: [expenseCategoryId], references: [id])
+  ExpensesSources   ExpensesSources?      @relation(fields: [expenseSourceId], references: [id])
+  Responsibles      ExpensesResponsibles? @relation(fields: [responsibleId], references: [id])
 }

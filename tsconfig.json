@@ -11,13 +11,27 @@
     "resolveJsonModule": true,
     "noImplicitAny": true,
     "moduleResolution": "node",
-    "baseUrl": "./",
+    "baseUrl": "./src",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "preserveSymlinks": true,
+    "paths": {
+      "*": [
+        "node_modules/*",
+        "types/*"
+      ],
+      "@src/*": [
+        "./*"
+      ],
+    }
   },
   "include": [
-    "src/**/*.ts"
+    "src"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
   ]
 }

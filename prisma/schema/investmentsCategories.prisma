@@ -1,0 +1,9 @@
+model InvestmentsCategories {
+  id          Int                 @id @default(autoincrement())
+  name        EInvestmentCategory
+  type        EInvestmentType
+  isNational  Boolean
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  Investments Investments[]
+}

@@ -1,0 +1,9 @@
+model ExpensesSources {
+  id              Int                 @id @default(autoincrement())
+  name            String
+  type            EExpenseSubcategory
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  Expenses        Expenses[]
+  AdvancePayments AdvancePayments[]
+}

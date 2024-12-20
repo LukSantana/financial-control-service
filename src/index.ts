@@ -2,7 +2,7 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import router from './router/index';
 import logger from './utils/logger';
-import { port } from './utils/environment';
+import { port } from '@src/core/config/environment';
 
 const prisma = new PrismaClient();
 

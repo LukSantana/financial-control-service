@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "Entries" ADD COLUMN     "date" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "Expenses" ALTER COLUMN "date" DROP NOT NULL;
+
+-- AlterTable
+ALTER TABLE "Investments" ADD COLUMN     "date" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP;
