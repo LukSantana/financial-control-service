@@ -1,40 +1,52 @@
-import { ExpensesCategories } from "@prisma/client";
-import { IExpenseCategoryDto } from "./types";
-import { assertRequiredProperties } from '@src/utils/assertProperties';
+import { type ExpensesCategories } from "@prisma/client";
+import { createExpenseCategorySchema, updateExpenseCategorySchema } from "../schema/index.schema";
+import { HttpError } from "@src/utils/httpError";
 
-export class ExpenseCategoryDto implements Partial<ExpensesCategories> {
+export class ExpenseCategoryDTO implements ExpensesCategories {
+  id: number;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+
   constructor({
     id,
     name,
     createdAt,
     updatedAt
-  }: Partial<IExpenseCategoryDto>) {
+  }: ExpensesCategories) {
     this.id = id;
     this.name = name;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
-
-  id?: number | undefined;
-  name?: string | undefined;
-  createdAt?: Date | undefined;
-  updatedAt?: Date | undefined;
-
-
   validateCreationParameters = (): void => {
-    assertRequiredProperties(this as Record<string, unknown>, [
-      'name'
-    ]);
+    const { error } = createExpenseCategorySchema.validate(this, { abortEarly: false });
+
+    if (error) {
+      throw new HttpError({
+        message: `Invalid data: ${error.message}`,
+        status: 400,
+        stack: new Error().stack!
+      });
+    }
   }
 
-  getCreationParameters = (): Partial<ExpensesCategories> => ({
-    name: this.name,
-  })
+  validateUpdateParameters = (): void => {
+    const { error } = updateExpenseCategorySchema.validate(this, { abortEarly: false });
+
+    if (error) {
+      throw new HttpError({
+        message: `Invalid data: ${error.message}`,
+        status: 400,
+        stack: new Error().stack!
+      });
+    }
+  }
 
   exportToResponse = (): Partial<ExpensesCategories> => ({
     id: this.id,
     name: this.name,
     createdAt: this.createdAt,
-    updatedAt: this.updatedAt
+    updatedAt: this.updatedAt,
   })
 }

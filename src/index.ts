@@ -1,26 +1,53 @@
 import express from 'express';
-import { PrismaClient } from '@prisma/client';
-import router from './router/index';
 import logger from './utils/logger';
 import { port } from '@src/core/config/environment';
+import { createAuthenticatedRouters, createUnauthenticatedRouters } from './router/index';
+import { PrismaClient } from '@prisma/client';
+import { configureFirebase } from './core/config/firebase';
+import { authMiddleware } from './middlewares/auth.middleware';
 
-const prisma = new PrismaClient();
+class Main {
+  app: express.Application
+  prismaClient: PrismaClient
 
-const main = async () => {
-  const app = express();
+  constructor() {
+    this.app = express();
+    this.prismaClient = new PrismaClient()
+  }
 
-  app.use(express.json());
-  app.use(router);
+  async start() {
+    try {
+      const { auth } = configureFirebase();
+      this.app.use(express.json());
+      this.app.set('firebaseAuth', auth)
+      this.app.set('prismaClient', this.prismaClient);
 
-  app.listen(port, () => {
-    logger.info(`Server is running on port ${port}`);
-  });
-};
+      this.app.use(
+        createUnauthenticatedRouters(
+          this.app
+        )
+      )
+      this.app.use(
+        authMiddleware,
+        createAuthenticatedRouters(
+          this.app
+        ),
+        authMiddleware
+      );
 
-main()
-  .catch((error) => {
-    throw error;
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+
+
+      this.app.listen(port, () => {
+        logger.info(`Server is running on port ${port}`);
+      });
+    } catch (err: any) {
+      console.error(err)
+      process.exit(1);
+    } finally {
+      await this.app.get('prismaClient').$disconnect();
+    }
+  }
+}
+
+new Main()
+  .start()

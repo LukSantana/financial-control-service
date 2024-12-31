@@ -6,7 +6,7 @@ import { TFetchMany, TFetchUnique, TCreate, TDelete, TUpdate } from "./types";
 
 export abstract class Repository<M extends TModelNames> {
   constructor(
-    protected readonly client: PrismaClient[M]
+    protected readonly client: PrismaClient[M],
   ) {
     this.client = client;
   }

@@ -1,4 +1,4 @@
-import { ExpensesCategoriesDto } from "../models/index.model";
+import { type ExpenseDTO } from "../../expensesCategories/models/index.model";
 
 export interface IGetExpensesCategoriesProps {
   where?: object;
@@ -7,19 +7,20 @@ export interface IGetExpensesCategoriesProps {
   take?: number;
 }
 
-export type TGetExpensesCategories = (props: IGetExpensesCategoriesProps) => Promise<ExpensesCategoriesDto[]>;
+export type TGetExpensesCategories = (props: IGetExpensesCategoriesProps) => Promise<ExpenseDTO[]>;
 
-interface IGetExpenseCategoryByIdProps {
+interface IGetExpenseByIdProps {
   id: number;
 }
 
-export type TGetExpenseCategoryById = ({ id }: IGetExpenseByIdProps) => Promise<ExpensesCategoriesDto>;
+export type TGetExpenseById = ({ id }: IGetExpenseByIdProps) => Promise<ExpenseDTO>;
 
-interface ICreateExpenseCategoryProps {
-  expenseCategoryData: Partial<ExpensesCategoriesDto>;
+interface ICreateExpenseProps {
+  data: Partial<ExpenseDTO>;
+  select?: object;
 }
 
-export type TCreateExpenseCategory = ({
-  expenseCategoryData,
+export type TCreateExpense = ({
+  data,
   select
-}: ICreateExpenseCategoryProps) => Promise<ExpensesCategoriesDto>;
+}: ICreateExpenseProps) => Promise<ExpenseDTO>;

@@ -1,4 +1,3 @@
-import { Response } from "express";
 import { IHttpError } from "./httpError";
 
-export type THandle = (error?: IHttpError, res: Response) => Promise<Response>;
+export type THandle = (error: IHttpError | undefined, res: Response<any, Record<string, any>>) => Promise<void>;

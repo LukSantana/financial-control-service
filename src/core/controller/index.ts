@@ -1,46 +1,34 @@
 import { ExceptionHandler } from "@src/utils/exceptionHandler";
 import {
   IController,
-  TCRUDOperation,
   TExecute,
-  THandleException,
   THandleRequest,
-  TOperationGeneric
+  TOperations,
 } from "./types";
-import logger from "@src/utils/logger";
-import { HttpError } from "@src/utils/httpError";
+import { LogsRegistry } from "@src/utils/logsHandling";
 
-export abstract class Controller implements IController {
+export abstract class Controller<
+  O extends keyof TOperations,
+> extends ExceptionHandler implements IController<O> {
   constructor(
-    protected readonly exceptionHandler: ExceptionHandler,
+    protected logsRegistry: LogsRegistry
   ) {
-    this.exceptionHandler = exceptionHandler;
+    super(logsRegistry);
   }
 
-  protected abstract fetchMany: TOperationGeneric;
-  protected abstract fetchUnique: TOperationGeneric;
-  protected abstract create: TOperationGeneric;
-  protected abstract update: TOperationGeneric;
-  protected abstract delete: TOperationGeneric;
+  protected handleRequest: THandleRequest<O> = async (req, res, method) => {
+    const methodFunction = this[method];
 
-  protected handleException: THandleException = async (error, res) => {
-    if (error instanceof HttpError) {
-      logger.error(`GET Expenses - Error: ${error.message}`);
-      this.exceptionHandler.handle(error, res);
+    if (!methodFunction || typeof methodFunction !== 'function') {
+      throw new Error(`Method ${method} not implemented`);
     }
 
-    this.exceptionHandler.handle(undefined, res);
-  }
-
-  protected handleRequest: THandleRequest = async (req, res, method) => {
-    await this[method as TCRUDOperation](req, res);
+    return await methodFunction(req, res);
   };
 
-  public execute: TExecute = async (req, res, method) => {
+  public execute: TExecute<O> = async (req, res, method) => {
     try {
-      logger.info(`${req.originalUrl} - Starting request`);
       await this.handleRequest(req, res, method);
-      logger.info(`${req.originalUrl} - Request finished successfully`);
     } catch (error: any) {
       await this.handleException(error, res);
     }

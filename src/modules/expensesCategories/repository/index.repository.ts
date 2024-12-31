@@ -1,55 +1,85 @@
+
+import { PrismaClient } from "@prisma/client";
+import { Repository } from "@src/core/repository";
 import {
-  IGetExpensesCategoriesProps,
-  TCreateExpenseCategory,
-  TGetExpenseCategoryById,
-  TGetExpensesCategories,
-} from "../types";
-import { ExpensesCategories, PrismaClient } from "@prisma/client";
-import { ExpenseCategoryDto } from "../models/index.model";
-import { HttpError } from "@src/utils/httpError";
+  type TCreate,
+  type TDelete,
+  type TFetchMany,
+  type TFetchUnique,
+  type TUpdate
+} from "@src/core/repository/types";
+import { handleDatabaseError } from "@src/utils/databaseErrorHandling";
+import logger from "@src/utils/logger";
 
-export class ExpensesCategoriesRepository {
-  private readonly expensesCategoriesClient: PrismaClient["expensesCategories"];
-
-  constructor() {
-    this.expensesCategoriesClient = new PrismaClient().expensesCategories;
+export class ExpensesCategoriesRepository extends Repository<"expensesCategories"> {
+  constructor(prisma: PrismaClient) {
+    super(
+      prisma.expensesCategories
+    );
   }
 
-  getExpensesCategories: TGetExpensesCategories = async (getExpensesCategoriesArgs: IGetExpensesCategoriesProps) => {
-    const expensesCategories = await this.expensesCategoriesClient.findMany(getExpensesCategoriesArgs);
+  fetchMany: TFetchMany<'expensesCategories'> = async (args) => {
+    try {
+      logger.info('Fetch ExpensesCategories - Repository - Fetch many expensesCategories')
+      const expensesCategories = await this.client.findMany(args);
 
-    if (!expensesCategories) {
-      throw new HttpError({
-        message: 'Expenses Categories not found',
-        status: 404,
-        stack: new Error().stack!
-      });
+      logger.info('Fetch ExpensesCategories - Repository - Successfully fetched many expensesCategories')
+      return expensesCategories;
+    } catch (err: any) {
+      logger.error(`Fetch ExpensesCategories - Repository - Error: ${err.message}`)
+      throw handleDatabaseError(err);
     }
-
-    return expensesCategories.map((expense) => new ExpenseCategoryDto(expense));
   }
 
-  getExpenseById: TGetExpenseCategoryById = async ({ id }) => {
-    const expense = await this.expensesCategoriesClient.findUnique({
-      where: { id },
-    });
+  fetchUnique: TFetchUnique<'expensesCategories'> = async (args) => {
+    try {
+      logger.info('Fetch ExpensesCategories - Repository - Fetch unique expenseCategory')
+      const expenseCategory = await this.client.findUnique(args);
 
-    if (!expense) {
-      throw new HttpError({
-        message: 'Expense Category not found',
-        status: 404,
-        stack: new Error().stack!
-      });
+      logger.info('Fetch ExpensesCategories - Repository - Successfully fetched unique expenseCategory')
+      return expenseCategory;
+    } catch (err: any) {
+      logger.error(`Fetch ExpensesCategories - Repository - Error: ${err.message}`)
+      throw handleDatabaseError(err);
     }
-
-    return new ExpenseCategoryDto(expense);
   }
 
-  createExpense: TCreateExpenseCategory = async ({ expenseCategoryData }) => {
-    const createdExpense = await this.expensesCategoriesClient.create({
-      data: expenseCategoryData as ExpensesCategories,
-    })
+  create: TCreate<'expensesCategories'> = async (args) => {
+    try {
+      logger.info('Create Expense Category - Repository - Create expenseCategory')
+      const createdExpense = await this.client.create(args)
 
-    return new ExpenseCategoryDto(createdExpense);
+      logger.info('Create Expense Category - Repository - Successfully created expenseCategory')
+      return createdExpense
+    } catch (err: any) {
+      logger.error(`Create Expense Category - Repository - Error: ${err}`)
+      throw handleDatabaseError(err);
+    }
+  }
+
+  update: TUpdate<'expensesCategories'> = async (args) => {
+    try {
+      logger.info('Update Expense Category - Repository - Update expenseCategory')
+      const updatedExpense = await this.client.update(args);
+
+      logger.info('Update Expense Category - Repository - Successfully updated expenseCategory')
+      return updatedExpense
+    } catch (err: any) {
+      logger.error(`Update Expense Category - Repository - Error: ${err.message}`)
+      throw handleDatabaseError(err);
+    }
+  }
+
+  delete: TDelete<'expensesCategories'> = async (args) => {
+    try {
+      logger.info('Delete Expense Category - Repository - Delete expenseCategory')
+      const deletedExpense = await this.client.delete(args);
+
+      logger.info('Delete Expense Category - Repository - Successfully deleted expenseCategory')
+      return deletedExpense
+    } catch (err: any) {
+      logger.error(`Delete Expense Category - Repository - Error: ${err.message}`)
+      throw handleDatabaseError(err);
+    }
   }
 }

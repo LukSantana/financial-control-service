@@ -10,7 +10,10 @@ import {
 } from "./types";
 import { type TDTOOptions } from "../models/types";
 
-export abstract class Service<D extends TDTOOptions, M extends TModelNames> implements IService<D, M> {
+export abstract class Service<
+  D extends TDTOOptions,
+  M extends TModelNames
+> implements IService<D, M> {
   constructor(
     protected readonly repository: Repository<M>,
   ) {

@@ -1,9 +1,9 @@
 import { type EExpenseType, type Expenses } from "@prisma/client";
-import { type IExpenseDto } from "./types";
-import { assertRequiredProperties } from '@src/utils/assertProperties';
+import { createExpenseSchema, updateExpenseSchema } from "../schema/index.schema";
+import { HttpError } from "@src/utils/httpError";
 
-export class ExpenseDto implements IExpenseDto {
-  constructor(expense: IExpenseDto) {
+export class ExpenseDTO implements Expenses {
+  constructor(expense: Expenses) {
     this.id = expense.id;
     this.type = expense.type;
     this.description = expense.description;
@@ -12,7 +12,7 @@ export class ExpenseDto implements IExpenseDto {
     this.date = expense.date;
     this.createdAt = expense.createdAt;
     this.updatedAt = expense.updatedAt;
-    this.sourceId = expense.sourceId;
+    this.expenseSourceId = expense.expenseSourceId;
     this.expenseCategoryId = expense.expenseCategoryId;
     this.expenseSourceId = expense.expenseSourceId;
     this.responsibleId = expense.responsibleId;
@@ -25,45 +25,33 @@ export class ExpenseDto implements IExpenseDto {
   date: Date | null;
   createdAt: Date;
   updatedAt: Date;
-  sourceId: number;
-  expenseCategoryId: number;
   expenseSourceId: number | null;
+  expenseCategoryId: number;
   responsibleId: number | null;
 
   validateCreationParameters = (): void => {
-    assertRequiredProperties(this as Record<string, unknown>, [
-      'type',
-      'description',
-      'amount',
-      'sourceId',
-      'expenseCategoryId',
-      'responsibleId'
-    ]);
+    const { error } = createExpenseSchema.validate(this, { abortEarly: false });
+
+    if (error) {
+      throw new HttpError({
+        message: `Invalid data: ${error.message}`,
+        status: 400,
+        stack: new Error().stack!
+      });
+    }
   }
 
   validateUpdateParameters = (): void => {
-    assertRequiredProperties(this as Record<string, unknown>, [
-      'id',
-      'type',
-      'description',
-      'amount',
-      'sourceId',
-      'expenseCategoryId',
-      'responsibleId'
-    ]);
-  }
+    const { error } = updateExpenseSchema.validate(this, { abortEarly: false });
 
-  getCreationParameters = (): Partial<Expenses> => ({
-    type: this.type,
-    description: this.description,
-    amount: this.amount,
-    installments: this.installments,
-    date: this.date,
-    sourceId: this.sourceId,
-    expenseCategoryId: this.expenseCategoryId,
-    expenseSourceId: this.expenseSourceId,
-    responsibleId: this.responsibleId,
-  })
+    if (error) {
+      throw new HttpError({
+        message: `Invalid data: ${error.message}`,
+        status: 400,
+        stack: new Error().stack!
+      });
+    }
+  }
 
   exportToResponse = (): Partial<Expenses> => ({
     id: this.id,
@@ -74,9 +62,8 @@ export class ExpenseDto implements IExpenseDto {
     date: this.date,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
-    sourceId: this.sourceId,
-    expenseCategoryId: this.expenseCategoryId,
     expenseSourceId: this.expenseSourceId,
+    expenseCategoryId: this.expenseCategoryId,
     responsibleId: this.responsibleId,
   })
 }

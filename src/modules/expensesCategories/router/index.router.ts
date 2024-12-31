@@ -1,33 +1,41 @@
-import { Router } from "express";
-import { ExpensesCategoriesController } from "../controller/index.controller";
-import { ExceptionHandler } from "@src/utils/exceptionHandler";
-import { ExpensesCategoriesService } from "../service/index.service";
-import { ExpensesCategoriesRepository } from "../repository/index.repository";
-import { PrismaClient } from "@prisma/client";
-import { LogsRegistry } from "@src/utils/logsHandling";
+import { Router, Application } from "express";
+import { ExpensesCategoriesController } from "@src/modules/expensesCategories/controller/index.controller";
+import { ExpensesCategoriesService } from "@src/modules/expensesCategories/service/index.service";
+import { ExpensesCategoriesRepository } from "@src/modules/expensesCategories/repository/index.repository";
 
-const router = Router();
-const expensesCategoriesController = new ExpensesCategoriesController(
-  new ExpensesCategoriesService({
-    expensesCategoriesRepository: new ExpensesCategoriesRepository()
-  }),
-  new ExceptionHandler(
-    new LogsRegistry(
-      new PrismaClient().logs
-    )
-  )
-);
+const createExpensesCategoriesRouter = (app: Application) => {
+  const router = Router();
 
-router.get("/expenses-categories", async (req, res) => {
-  await expensesCategoriesController.getExpensesCategories(req, res);
-});
+  const expensesCategoriesController = new ExpensesCategoriesController(
+    new ExpensesCategoriesService(
+      new ExpensesCategoriesRepository(
+        app.get("prismaClient"),
+      )
+    ),
+  );
 
-router.get("/expenses-categories/:id", async (req, res) => {
-  await expensesCategoriesController.getExpenseCategoryById(req, res);
-});
+  router.get("/expensesCategories", async (req, res) => {
+    await expensesCategoriesController.execute(req, res, 'fetchMany');
+  });
 
-router.post("/expenses-categories", async (req, res) => {
-  await expensesCategoriesController.createExpenseCategory(req, res)
-});
+  router.get("/expensesCategories/:id", async (req, res) => {
+    await expensesCategoriesController.execute(req, res, 'fetchUnique');
+  });
 
-export default router;
+  router.post("/expensesCategories", async (req, res) => {
+    await expensesCategoriesController.execute(req, res, 'create')
+  });
+
+  router.put("/expensesCategories/:id", async (req, res) => {
+    await expensesCategoriesController.execute(req, res, 'update')
+  });
+
+  router.delete("/expensesCategories/:id", async (req, res) => {
+    await expensesCategoriesController.execute(req, res, 'delete')
+  });
+
+  return router;
+}
+
+
+export default createExpensesCategoriesRouter;

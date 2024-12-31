@@ -1,14 +1,20 @@
-import { HttpError } from "@src/utils/httpError";
 import { Request, Response } from "express";
 
-export type TCRUDOperation = 'fetchMany' | 'fetchUnique' | 'create' | 'update' | 'delete';
+export type TCRUDOperationKeys = 'fetchMany' | 'fetchUnique' | 'create' | 'update' | 'delete';
+export type TAuthOperationKeys = 'login' | 'logout' | 'register';
+export type TOperationsKeys = TCRUDOperationKeys | TAuthOperation;
 
 type TOperationGeneric = (req: Request, res: Response) => Promise<void>
 
-type TExecute = (req: Request, res: Response, method: TCRUDOperation) => Promise<void>;
-type THandleRequest = (req: Request, res: Response, method: TCRUDOperation) => Promise<void>;
-type THandleException = (error: HttpError | Error, res) => Promise<void>;
+export type IOperations = Record<CRUDOperations | TAuthOperationKeys, TOperationGeneric>;
 
-export interface IController {
-  execute: TExecute;
+export type TCrudOperations = Record<CRUDOperations, TOperationGeneric>;
+export type TAuthOperations = Record<TAuthOperationKeys, TOperationGeneric>;
+export type TOperations = TCrudOperations | TAuthOperations;
+
+export type TExecute<O extends IOperations> = (req: Request, res: Response, method: O) => Promise<void>;
+export type THandleRequest<O extends IOperations> = (req: Request, res: Response, method: O) => Promise<void>;
+
+export interface IController<O extends TOperations> {
+  execute: TExecute<O>;
 }
