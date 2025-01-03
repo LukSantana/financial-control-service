@@ -19,7 +19,7 @@ const createReservationsRouter = (app: Application) => {
   });
 
   router.get("/reservations/:id", async (req, res) => {
-    await reservationsController.execute(req, res, 'fetchUnique');
+    await reservationsController.execute(req, res, 'fetchOne');
   });
 
   router.post("/reservations", async (req, res) => {

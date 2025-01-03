@@ -19,7 +19,7 @@ const createAdvancePaymentsRouter = (app: Application) => {
   });
 
   router.get("/advancePayments/:id", async (req, res) => {
-    await advancePaymentsController.execute(req, res, 'fetchUnique');
+    await advancePaymentsController.execute(req, res, 'fetchOne');
   });
 
   router.post("/advancePayments", async (req, res) => {

@@ -1,0 +1,13 @@
+{
+  "id": 1,
+  "type": "FIXED",
+  "description": "Test",
+  "amount": 10000,
+  "installments": null,
+  "date": "2024-12-20T01:40:39.663Z",
+  "createdAt": "2024-12-20T01:40:39.663Z",
+  "updatedAt": "2024-12-20T01:38:41.432Z",
+  "expenseSourceId": 1,
+  "expenseCategoryId": 1,
+  "responsibleId": 1
+}

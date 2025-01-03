@@ -1,20 +1,19 @@
 import assert from "assert";
-import { InvestmentDTO } from "@src/modules/investments/models/index.model";
 import { HttpError } from "@src/utils/httpError";
 import { Service } from "@src/core/service";
 import {
   type TCreate,
   type TDelete,
   type TFetchMany,
-  type TFetchUnique,
+  type TFetchOne,
   type TUpdate
 } from "@src/core/service/types";
-import { validateData } from "@src/utils/validator";
-import { createInvestmentSchema, investmentsSchema, updateInvestmentSchema } from "../schema/index.schema";
+import { createInvestmentDTO, investmentsDTO, updateInvestmentDTO } from "../validator/index.validator";
 import logger from "@src/utils/logger";
+import { validate, validateRequiredOperationArgs } from "@src/core/validator";
 
-export class InvestmentsService extends Service<InvestmentDTO, 'investments'> {
-  fetchMany: TFetchMany<InvestmentDTO, 'investments'> = async (args) => {
+export class InvestmentsService extends Service<'investments'> {
+  fetchMany: TFetchMany<'investments'> = async (args) => {
     try {
       logger.info('Fetch Investments - Service - Enter')
 
@@ -40,35 +39,28 @@ export class InvestmentsService extends Service<InvestmentDTO, 'investments'> {
         });
       }
 
-      const validatedInvestments = investments.map(investment => {
-        const validatedInvestment = validateData(investment, investmentsSchema);
-        return new InvestmentDTO(validatedInvestment);
-      });
 
       logger.info('Fetch Investments - Service - Exit')
-      return validatedInvestments;
+      return investments;
     } catch (err: any) {
       logger.error(`Fetch Investments - Service - Error: ${err.message}`)
       throw new HttpError({
         message: err.message || 'Failed to fetch investments',
         status: err.status || 400,
-        stack: err.stack
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  fetchUnique: TFetchUnique<InvestmentDTO, 'investments'> = async (args) => {
+  fetchOne: TFetchOne<'investments'> = async (args) => {
     try {
       logger.info('Fetch Investment by ID - Service - Enter')
-      if (!args.id) {
-        throw new HttpError({
-          message: 'Investment ID is required',
-          status: 400,
-          stack: new Error().stack!
-        });
-      }
+      validateRequiredOperationArgs({
+        args,
+        operation: 'findUnique'
+      })
 
-      const investment = await this.repository.fetchUnique(args);
+      const investment = await this.repository.fetchOne(args);
 
       if (!investment) {
         throw new HttpError({
@@ -78,37 +70,34 @@ export class InvestmentsService extends Service<InvestmentDTO, 'investments'> {
         });
       }
 
-      const validatedInvestment = validateData(investment, investmentsSchema);
-
       logger.info('Fetch Investment by ID - Service - Exit')
-      return new InvestmentDTO(validatedInvestment);
+      return investment;
     } catch (err: any) {
       logger.error(`Fetch Investment by ID - Service - Error: ${err.message}`)
       throw new HttpError({
         message: err.message || 'Failed to fetch investment by id',
         status: err.status || 400,
-        stack: err.stack
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  create: TCreate<InvestmentDTO, 'investments'> = async (args) => {
+  create: TCreate<'investments'> = async (args) => {
     try {
       logger.info('Create Investment - Service - Enter');
-      assert(args.data, 'Investment data is required');
+      validateRequiredOperationArgs({
+        args,
+        operation: 'create'
+      })
 
       const investmentData = args.data;
 
-      const { error } = createInvestmentSchema.validate(investmentData, { abortEarly: false });
-
-      if (error) {
-        logger.error(`Create Investment - Invalid data: ${error.message}`);
-        throw new HttpError({
-          message: `Invalid data: ${error.message}`,
-          status: 400,
-          stack: new Error().stack!
-        });
-      }
+      validate({
+        operation: 'create',
+        modelName: 'investments',
+        data: investmentData,
+        DTO: createInvestmentDTO
+      })
 
       const createdInvestment = await this.repository.create(args);
 
@@ -120,38 +109,35 @@ export class InvestmentsService extends Service<InvestmentDTO, 'investments'> {
         });
       }
 
-      const validatedInvestment = validateData(createdInvestment, investmentsSchema);
-
       logger.info('Create Investment - Service - Exit');
-      return new InvestmentDTO(validatedInvestment);
+      return createdInvestment;
     } catch (err: any) {
       logger.error(`Create Investment - Service - Error: ${err.message}`);
       throw new HttpError({
         message: err.message || 'Failed to create investment',
         status: err.status || 400,
-        stack: err.stack
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  update: TUpdate<InvestmentDTO, 'investments'> = async (args) => {
+  update: TUpdate<'investments'> = async (args) => {
     try {
       logger.info('Update Investment - Service - Enter');
 
-      assert(args.data, 'Investment data is required');
-      assert(args.where, 'Investment ID is required');
+      validateRequiredOperationArgs({
+        args,
+        operation: 'update'
+      })
 
       const investmentData = args.data;
 
-      const { error } = updateInvestmentSchema.validate(investmentData, { abortEarly: false });
-
-      if (error) {
-        throw new HttpError({
-          message: `Invalid data: ${error.message}`,
-          status: 400,
-          stack: new Error().stack!
-        });
-      }
+      validate({
+        operation: 'update',
+        modelName: 'investments',
+        data: investmentData,
+        DTO: updateInvestmentDTO
+      })
 
       const updatedInvestment = await this.repository.update(args);
 
@@ -163,24 +149,25 @@ export class InvestmentsService extends Service<InvestmentDTO, 'investments'> {
         });
       }
 
-      const validatedInvestment = validateData(updatedInvestment, investmentsSchema);
-
       logger.info('Update Investment - Service - Exit');
-      return new InvestmentDTO(validatedInvestment);
+      return updatedInvestment;
     } catch (err: any) {
       logger.error(`Update Investment - Service - Error: ${err.message}`);
       throw new HttpError({
         message: err.message || 'Failed to update investment',
         status: err.status || 400,
-        stack: err.stack
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  delete: TDelete<InvestmentDTO, 'investments'> = async (args) => {
+  delete: TDelete<'investments'> = async (args) => {
     try {
       logger.info('Delete Investment - Service - Enter');
-      assert(args.where.id, 'Investment ID is required');
+      validateRequiredOperationArgs({
+        args,
+        operation: 'delete'
+      })
 
       const deletedInvestment = await this.repository.delete(args);
 
@@ -192,16 +179,14 @@ export class InvestmentsService extends Service<InvestmentDTO, 'investments'> {
         });
       }
 
-      const validatedInvestment = validateData(deletedInvestment, investmentsSchema);
-
       logger.info('Delete Investment - Service - Exit');
-      return new InvestmentDTO(validatedInvestment);
+      return deletedInvestment;
     } catch (err: any) {
       logger.error(`Delete Investment - Service - Error: ${err.message}`);
       throw new HttpError({
         message: err.message || 'Failed to delete investment',
         status: err.status || 400,
-        stack: err.stack
+        stack: err.stack || new Error().stack!
       });
     }
   }

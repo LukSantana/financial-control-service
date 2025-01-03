@@ -5,28 +5,26 @@ import {
   type TCreate,
   type TDelete,
   type TFetchMany,
-  type TFetchUnique,
+  type TFetchOne,
   type TUpdate
 } from "./types";
-import { type TDTOOptions } from "../models/types";
 
 export abstract class Service<
-  D extends TDTOOptions,
   M extends TModelNames
-> implements IService<D, M> {
+> implements IService<M> {
   constructor(
     protected readonly repository: Repository<M>,
   ) {
     this.repository = repository;
   }
 
-  abstract fetchMany: TFetchMany<D, M>;
+  abstract fetchMany: TFetchMany<M>;
 
-  abstract fetchUnique: TFetchUnique<D, M>;
+  abstract fetchOne: TFetchOne<M>;
 
-  abstract create: TCreate<D, M>;
+  abstract create: TCreate<M>;
 
-  abstract update: TUpdate<D, M>;
+  abstract update: TUpdate<M>;
 
-  abstract delete: TDelete<D, M>;
+  abstract delete: TDelete<M>;
 }

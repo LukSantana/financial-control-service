@@ -1,20 +1,19 @@
 import assert from "assert";
-import { ExpenseDTO } from "@src/modules/expenses/models/index.model";
 import { HttpError } from "@src/utils/httpError";
 import { Service } from "@src/core/service";
 import {
   type TCreate,
   type TDelete,
   type TFetchMany,
-  type TFetchUnique,
+  type TFetchOne,
   type TUpdate
 } from "@src/core/service/types";
-import { validateData } from "@src/utils/validator";
-import { createExpenseSchema, expensesSchema, updateExpenseSchema } from "../schema/index.schema";
 import logger from "@src/utils/logger";
+import { createExpenseDTO, updateExpenseDTO } from "../validator/index.validator";
+import { validate, validateRequiredOperationArgs } from "@src/core/validator";
 
-export class ExpensesService extends Service<ExpenseDTO, 'expenses'> {
-  fetchMany: TFetchMany<ExpenseDTO, 'expenses'> = async (args) => {
+export class ExpensesService extends Service<'expenses'> {
+  fetchMany: TFetchMany<'expenses'> = async (args) => {
     try {
       logger.info('Fetch Expenses - Service - Fetch many expenses')
 
@@ -40,34 +39,27 @@ export class ExpensesService extends Service<ExpenseDTO, 'expenses'> {
         });
       }
 
-      const validatedExpenses = expenses.map(expense => {
-        const validatedExpense = validateData(expense, expensesSchema);
-        return new ExpenseDTO(validatedExpense);
-      });
-
-      return validatedExpenses;
+      return expenses;
     } catch (err: any) {
       logger.error(`Fetch Expenses - Service - Error: ${err.message}`)
       throw new HttpError({
-        message: 'Failed to fetch expenses',
-        status: 500,
-        stack: err.stack
+        message: err.message || 'Failed to fetch expenses',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  fetchUnique: TFetchUnique<ExpenseDTO, 'expenses'> = async (args) => {
+  fetchOne: TFetchOne<'expenses'> = async (args) => {
     try {
       logger.info('Fetch Expense by ID - Service - Fetch unique expense')
-      if (!args.id) {
-        throw new HttpError({
-          message: 'Expense ID is required',
-          status: 400,
-          stack: new Error().stack!
-        });
-      }
 
-      const expense = await this.repository.fetchUnique(args);
+      validateRequiredOperationArgs({
+        args,
+        operation: 'findUnique'
+      });
+
+      const expense = await this.repository.fetchOne(args);
 
       if (!expense) {
         throw new HttpError({
@@ -77,36 +69,34 @@ export class ExpensesService extends Service<ExpenseDTO, 'expenses'> {
         });
       }
 
-      const validatedExpense = validateData(expense, expensesSchema);
-
-      return new ExpenseDTO(validatedExpense);
+      return expense;
     } catch (err: any) {
       logger.error(`Fetch Expense by ID - Service - Error: ${err.message}`)
       throw new HttpError({
-        message: 'Failed to fetch expense by id',
-        status: 500,
-        stack: err.stack
+        message: err.message || 'Failed to fetch expense by id',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  create: TCreate<ExpenseDTO, 'expenses'> = async (args) => {
+  create: TCreate<'expenses'> = async (args) => {
     try {
       logger.info('Create Expense - Service - Create expense');
-      assert(args.data, 'Expense data is required');
+
+      validateRequiredOperationArgs({
+        args,
+        operation: 'create'
+      });
 
       const expenseData = args.data;
 
-      const { error } = createExpenseSchema.validate(expenseData, { abortEarly: false });
-
-      if (error) {
-        logger.error(`Create Expense - Invalid data: ${error.message}`);
-        throw new HttpError({
-          message: `Invalid data: ${error.message}`,
-          status: 400,
-          stack: new Error().stack!
-        });
-      }
+      validate({
+        operation: 'create',
+        modelName: 'expenses',
+        data: expenseData,
+        DTO: createExpenseDTO
+      });
 
       const createdExpense = await this.repository.create(args);
 
@@ -118,37 +108,34 @@ export class ExpensesService extends Service<ExpenseDTO, 'expenses'> {
         });
       }
 
-      const validatedExpense = validateData(createdExpense, expensesSchema);
-
-      return new ExpenseDTO(validatedExpense);
+      return createdExpense;
     } catch (err: any) {
       logger.error(`Create Expense - Service - Error: ${err.message}`);
       throw new HttpError({
-        message: 'Failed to create expense',
-        status: 500,
-        stack: err.stack
+        message: err.message || 'Failed to create expense',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  update: TUpdate<ExpenseDTO, 'expenses'> = async (args) => {
+  update: TUpdate<'expenses'> = async (args) => {
     try {
       logger.info('Update Expense - Service - Update expense');
 
-      assert(args.data, 'Expense data is required');
-      assert(args.where, 'Expense ID is required');
+      validateRequiredOperationArgs({
+        args,
+        operation: 'update'
+      });
 
       const expenseData = args.data;
 
-      const { error } = updateExpenseSchema.validate(expenseData, { abortEarly: false });
-
-      if (error) {
-        throw new HttpError({
-          message: `Invalid data: ${error.message}`,
-          status: 400,
-          stack: new Error().stack!
-        });
-      }
+      validate({
+        operation: 'update',
+        modelName: 'expenses',
+        data: expenseData,
+        DTO: updateExpenseDTO
+      });
 
       const updatedExpense = await this.repository.update(args);
 
@@ -160,23 +147,25 @@ export class ExpensesService extends Service<ExpenseDTO, 'expenses'> {
         });
       }
 
-      const validatedExpense = validateData(updatedExpense, expensesSchema);
-
-      return new ExpenseDTO(validatedExpense);
+      return updatedExpense;
     } catch (err: any) {
       logger.error(`Update Expense - Service - Error: ${err.message}`);
       throw new HttpError({
-        message: 'Failed to update expense',
-        status: 500,
-        stack: err.stack
+        message: err.message || 'Failed to update expense',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  delete: TDelete<ExpenseDTO, 'expenses'> = async (args) => {
+  delete: TDelete<'expenses'> = async (args) => {
     try {
       logger.info('Delete Expense - Service - Delete expense');
-      assert(args.where.id, 'Expense ID is required');
+
+      validateRequiredOperationArgs({
+        args,
+        operation: 'delete'
+      });
 
       const deletedExpense = await this.repository.delete(args);
 
@@ -188,15 +177,13 @@ export class ExpensesService extends Service<ExpenseDTO, 'expenses'> {
         });
       }
 
-      const validatedExpense = validateData(deletedExpense, expensesSchema);
-
-      return new ExpenseDTO(validatedExpense);
+      return deletedExpense;
     } catch (err: any) {
       logger.error(`Delete Expense - Service - Error: ${err.message}`);
       throw new HttpError({
-        message: 'Failed to delete expense',
-        status: 500,
-        stack: err.stack
+        message: err.message || 'Failed to delete expense',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
       });
     }
   }

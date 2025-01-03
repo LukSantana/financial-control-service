@@ -27,7 +27,7 @@ export class AuthController extends Controller<keyof TAuthOperations> {
 
       logger.info('Auth - Login - Controller - Request finished successfully')
 
-      res.json(login);
+      res.json(login.user);
     } catch (err: any) {
       logger.error(`Auth - Login - Controller - Controller - Error: ${err.message}`)
       this.handleException(err, res);

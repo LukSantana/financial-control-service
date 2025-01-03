@@ -5,6 +5,7 @@ check-leaks: true
 color: true
 delay: false
 diff: true
+env: 'NODE_ENV=test'
 exit: false
 extension: ['js', 'cjs', 'mjs', 'ts']
 fail-zero: true
@@ -22,10 +23,12 @@ node-option:
   - 'unhandled-rejections=strict'
 package: './package.json'
 parallel: false
-recursive: false
+recursive: true
 reporter: 'spec'
 require:
   - 'ts-node/register'
   - 'tsconfig-paths/register'
   - 'source-map-support/register'
 ignore: ['**/*.d.ts']
+timeout: 10000
+ui: bdd

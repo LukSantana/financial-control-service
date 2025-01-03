@@ -8,7 +8,7 @@ export type TFetchMany<
   M extends TModelNames,
 > = (args: TOperationsArgs<M, 'findMany'>) => Promise<TOperationResult<M, 'findMany'>>;
 
-export type TFetchUnique<
+export type TFetchOne<
   M extends TModelNames,
 > = (args: TOperationsArgs<M, 'findUnique'>) => Promise<TOperationResult<M, 'findUnique'>>;
 

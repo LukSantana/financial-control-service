@@ -1,12 +1,11 @@
 import { EntriesService } from "../service/index.service";
 import { LogsRegistry } from "@src/utils/logsHandling";
 import { PrismaClient } from "@prisma/client";
-import { Controller } from "@src/core/controller";
 import logger from "@src/utils/logger";
-import { type TCrudOperations, type TOperationGeneric } from "@src/core/controller/types";
-import { EntryDTO } from "../models/index.model";
+import { type TOperationGeneric } from "@src/core/controller/types";
+import { CrudController } from "@src/core/controller/crudController";
 
-export class EntriesController extends Controller<keyof TCrudOperations> {
+export class EntriesController extends CrudController {
   constructor(
     private readonly service: EntriesService,
   ) {
@@ -34,32 +33,32 @@ export class EntriesController extends Controller<keyof TCrudOperations> {
         skip,
       }
 
-      const entries: EntryDTO[] = await this.service.fetchMany(fetchManyArgs);
+      const entries = await this.service.fetchMany(fetchManyArgs);
 
       logger.info('Fetch Entries - Controller - Request finished successfully')
 
-      res.json(entries.map((entry) => entry.exportToResponse()));
+      res.json(entries);
     } catch (err: any) {
       logger.error(`Fetch Entries - Controller - Error: ${err.message}`)
       this.handleException(err, res);
     }
   }
 
-  protected fetchUnique: TOperationGeneric = async (req, res) => {
+  protected fetchOne: TOperationGeneric = async (req, res) => {
     try {
       logger.info('Fetch Entry by ID - Controller - Starting request')
 
       const { id } = req.params;
 
-      const fetchUniqueArgs = {
+      const fetchOneArgs = {
         where: { id }
       }
 
-      const entry: EntryDTO = await this.service.fetchUnique(fetchUniqueArgs);
+      const entry = await this.service.fetchOne(fetchOneArgs);
 
       logger.info('Fetch Entry by ID - Request finished successfully')
 
-      res.json(entry.exportToResponse());
+      res.json(entry);
     } catch (err: any) {
       logger.error(`Fetch Entry By ID - Controller - Error: ${err.message}`)
       this.handleException(err, res);
@@ -74,11 +73,11 @@ export class EntriesController extends Controller<keyof TCrudOperations> {
         data: req.body
       }
 
-      const entry: EntryDTO = await this.service.create(createArgs);
+      const entry = await this.service.create(createArgs);
 
       logger.info('Create Entry - Controller - Request finished successfully')
 
-      res.json(entry.exportToResponse());
+      res.json(entry);
     } catch (err: any) {
       logger.error(`Create Entry - Controller - Error: ${err.message}`)
       this.handleException(err, res);
@@ -96,11 +95,11 @@ export class EntriesController extends Controller<keyof TCrudOperations> {
         data: req.body,
       }
 
-      const entry: EntryDTO = await this.service.update(updateArgs);
+      const entry = await this.service.update(updateArgs);
 
       logger.info('Update Entry - Controller - Request finished successfully')
 
-      res.json(entry.exportToResponse());
+      res.json(entry);
     } catch (err: any) {
       logger.error(`Update Entry - Controller - Error: ${err.message}`)
       this.handleException(err, res);
@@ -117,11 +116,11 @@ export class EntriesController extends Controller<keyof TCrudOperations> {
         where: { id }
       }
 
-      const entry: EntryDTO = await this.service.delete(deleteArgs);
+      const entry = await this.service.delete(deleteArgs);
 
       logger.info('Delete Entry - Request finished successfully')
 
-      res.json(entry.exportToResponse());
+      res.json(entry);
     } catch (err: any) {
       logger.error(`Delete Entry - Controller - Error: ${err.message}`)
       this.handleException(err, res);

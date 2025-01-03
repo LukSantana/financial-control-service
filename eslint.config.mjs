@@ -7,6 +7,7 @@ import prettierPlugin from "eslint-plugin-prettier";
 import prettierConfig from "eslint-config-prettier";
 import typescriptEslintParser from "@typescript-eslint/parser";
 import typescriptEslintPlugin from "@typescript-eslint/eslint-plugin";
+import chaiFriendlyPlugin from "eslint-plugin-chai-friendly";
 
 const { rules } = eslintAll;
 
@@ -26,18 +27,29 @@ export default [
     {
         files: [
             "src/**/*.ts",
+            "tests/**/*.ts",
             "database/**/*.ts",
             "config/**/*.ts",
         ],
         languageOptions: {
             parser: typescriptEslintParser,
             sourceType: "module",
-            globals: globals.browser
+            globals: {
+                ...globals.browser,
+                afterAll: "readonly",
+                beforeAll: "readonly",
+                describe: "readonly",
+                expect: "readonly",
+                it: "readonly",
+                context: "readonly",
+                mocha: "readonly",
+            }
         },
         plugins: {
             "@typescript-eslint": typescriptEslintPlugin,
             import: importPlugin,
             prettier: prettierPlugin,
+            "chai-friendly": chaiFriendlyPlugin,
         },
         rules: {
             ...rules,
@@ -47,6 +59,8 @@ export default [
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-unsafe-function-type": "off",
             "class-methods-use-this": "off",
+            "id-length": "off",
+            "init-declarations": "off",
             "max-lines": "off",
             "max-lines-per-function": "off",
             "max-nested-callbacks": "off",
@@ -61,6 +75,7 @@ export default [
             "no-ternary": "off",
             "no-undef": "off",
             "no-undefined": "off",
+            "no-plusplus": "off",
             "one-var": "off",
             "sort-imports": "off",
             "sort-keys": "off",
@@ -68,20 +83,18 @@ export default [
             "strict": "off",
             "require-await": "off",
             "require-atomic-updates": "off",
-        }
+        },
+        overrides: [
+            {
+                files: ['tests/**/*.test.js', 'tests/**/*.spec.ts'],
+                rules: {
+                    "max-len": "off",
+                    "max-lines": "off",
+                    "no-param-reassign": "off",
+                    "func-names": "off",
+                    "no-unused-expressions": "off",
+                },
+            },
+        ],
     },
-    {
-        files: ["tests/**/*.ts"],
-        languageOptions: {
-            globals: {
-                afterAll: "readonly",
-                beforeAll: "readonly",
-                describe: "readonly",
-                expect: "readonly",
-                it: "readonly",
-                jest: "readonly",
-                strapi: "readonly"
-            }
-        }
-    }
 ];

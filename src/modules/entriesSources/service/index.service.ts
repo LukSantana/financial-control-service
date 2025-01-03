@@ -1,22 +1,21 @@
 import assert from "assert";
-import { EntrySourceDTO } from "@src/modules/entriesSources/models/index.model";
 import { HttpError } from "@src/utils/httpError";
 import { Service } from "@src/core/service";
 import {
   type TCreate,
   type TDelete,
   type TFetchMany,
-  type TFetchUnique,
+  type TFetchOne,
   type TUpdate
 } from "@src/core/service/types";
-import { validateData } from "@src/utils/validator";
-import { createEntrySourceSchema, entriesSourcesSchema, updateEntrySourceSchema } from "../schema/index.schema";
+import { validate, validateRequiredOperationArgs } from "@src/core/validator";
+import { createEntrySourceDTO, updateEntrySourceDTO } from "../validator/index.validator";
 import logger from "@src/utils/logger";
 
-export class EntriesSourcesService extends Service<EntrySourceDTO, 'entriesSources'> {
-  fetchMany: TFetchMany<EntrySourceDTO, 'entriesSources'> = async (args) => {
+export class EntriesSourcesService extends Service<'entriesSources'> {
+  fetchMany: TFetchMany<'entriesSources'> = async (args) => {
     try {
-      logger.info('Fetch EntriesSources - Service - Enter')
+      logger.info('Fetch Entries Sources - Service - Enter')
 
       let getEntrySourceOptions = {};
 
@@ -34,83 +33,72 @@ export class EntriesSourcesService extends Service<EntrySourceDTO, 'entriesSourc
 
       if (!entriesSources) {
         throw new HttpError({
-          message: 'EntriesSources not found',
+          message: 'Entries Sources not found',
           status: 404,
           stack: new Error().stack!
         });
       }
 
-      const validatedEntriesSources = entriesSources.map(entrySource => {
-        const validatedEntrySource = validateData(entrySource, entriesSourcesSchema);
-        return new EntrySourceDTO(validatedEntrySource);
-      });
+      logger.info('Fetch Entries Sources - Service - Exit')
 
-      logger.info('Fetch EntriesSources - Service - Exit')
-
-      return validatedEntriesSources;
+      return entriesSources;
     } catch (err: any) {
-      logger.error(`Fetch EntriesSources - Service - Error: ${err.message}`)
+      logger.error(`Fetch Entries Sources - Service - Error: ${err.message}`)
       throw new HttpError({
-        message: 'Failed to fetch entriesSources',
-        status: 400,
-        stack: err.stack
+        message: err.message || 'Failed to fetch entries sources',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  fetchUnique: TFetchUnique<EntrySourceDTO, 'entriesSources'> = async (args) => {
+  fetchOne: TFetchOne<'entriesSources'> = async (args) => {
     try {
       logger.info('Fetch EntrySource by ID - Service - Enter')
-      if (!args.id) {
-        throw new HttpError({
-          message: 'EntrySource ID is required',
-          status: 400,
-          stack: new Error().stack!
-        });
-      }
+      validateRequiredOperationArgs({
+        args,
+        operation: 'findUnique'
+      })
 
-      const entrySource = await this.repository.fetchUnique(args);
+      const entrySource = await this.repository.fetchOne(args);
 
       if (!entrySource) {
         throw new HttpError({
-          message: 'EntrySource not found',
+          message: 'Entry Source not found',
           status: 404,
           stack: new Error().stack!
         });
       }
 
-      const validatedEntrySource = validateData(entrySource, entriesSourcesSchema);
-
       logger.info('Fetch EntrySource by ID - Service - Exit')
 
-      return new EntrySourceDTO(validatedEntrySource);
+      return entrySource;
     } catch (err: any) {
       logger.error(`Fetch Entry Source by ID - Service - Error: ${err.message}`)
       throw new HttpError({
-        message: 'Failed to fetch entry source by id',
-        status: 400,
-        stack: err.stack
+        message: err.message || 'Failed to fetch entry source by id',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  create: TCreate<EntrySourceDTO, 'entriesSources'> = async (args) => {
+  create: TCreate<'entriesSources'> = async (args) => {
     try {
       logger.info('Create Entry Source - Service - Enter');
-      assert(args.data, 'Entry source data is required');
+      validateRequiredOperationArgs({
+        args,
+        operation: 'create'
+      })
 
       const expenseData = args.data;
 
-      const { error } = createEntrySourceSchema.validate(expenseData, { abortEarly: false });
-
-      if (error) {
-        logger.error(`Create Entry source - Invalid data: ${error.message}`);
-        throw new HttpError({
-          message: `Invalid data: ${error.message}`,
-          status: 400,
-          stack: new Error().stack!
-        });
-      }
+      validate({
+        operation: 'create',
+        modelName: 'entriesSources',
+        data: expenseData,
+        DTO: createEntrySourceDTO
+      })
 
       const createdEntrySource = await this.repository.create(args);
 
@@ -122,39 +110,36 @@ export class EntriesSourcesService extends Service<EntrySourceDTO, 'entriesSourc
         });
       }
 
-      const validatedEntrySource = validateData(createdEntrySource, entriesSourcesSchema);
-
       logger.info('Create Entry Source - Service - Exit');
 
-      return new EntrySourceDTO(validatedEntrySource);
+      return createdEntrySource;
     } catch (err: any) {
       logger.error(`Create EntrySource - Service - Error: ${err.message}`);
       throw new HttpError({
-        message: 'Failed to create entry source',
-        status: 400,
-        stack: err.stack
+        message: err.message || 'Failed to create entry source',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  update: TUpdate<EntrySourceDTO, 'entriesSources'> = async (args) => {
+  update: TUpdate<'entriesSources'> = async (args) => {
     try {
       logger.info('Update EntrySource - Service - Enter');
 
-      assert(args.data, 'EntrySource data is required');
-      assert(args.where, 'EntrySource ID is required');
+      validateRequiredOperationArgs({
+        args,
+        operation: 'update'
+      })
 
       const expenseData = args.data;
 
-      const { error } = updateEntrySourceSchema.validate(expenseData, { abortEarly: false });
-
-      if (error) {
-        throw new HttpError({
-          message: `Invalid data: ${error.message}`,
-          status: 400,
-          stack: new Error().stack!
-        });
-      }
+      validate({
+        operation: 'update',
+        modelName: 'entriesSources',
+        data: expenseData,
+        DTO: updateEntrySourceDTO
+      })
 
       const updatedEntrySource = await this.repository.update(args);
 
@@ -166,25 +151,26 @@ export class EntriesSourcesService extends Service<EntrySourceDTO, 'entriesSourc
         });
       }
 
-      const validatedEntrySource = validateData(updatedEntrySource, entriesSourcesSchema);
-
       logger.info('Update Entry Source - Service - Exit');
 
-      return new EntrySourceDTO(validatedEntrySource);
+      return updatedEntrySource;
     } catch (err: any) {
       logger.error(`Update entry source - Service - Error: ${err.message}`);
       throw new HttpError({
-        message: 'Failed to update entry source',
-        status: 400,
-        stack: err.stack
+        message: err.message || 'Failed to update entry source',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  delete: TDelete<EntrySourceDTO, 'entriesSources'> = async (args) => {
+  delete: TDelete<'entriesSources'> = async (args) => {
     try {
       logger.info('Delete Entry Source - Service - Enter');
-      assert(args.where.id, 'Entry Source ID is required');
+      validateRequiredOperationArgs({
+        args,
+        operation: 'delete'
+      })
 
       const deletedEntrySource = await this.repository.delete(args);
 
@@ -196,17 +182,15 @@ export class EntriesSourcesService extends Service<EntrySourceDTO, 'entriesSourc
         });
       }
 
-      const validatedEntrySource = validateData(deletedEntrySource, entriesSourcesSchema);
-
       logger.info('Delete Entry Source - Service - Exit');
 
-      return new EntrySourceDTO(validatedEntrySource);
+      return deletedEntrySource;
     } catch (err: any) {
       logger.error(`Delete entry source - Service - Error: ${err.message}`);
       throw new HttpError({
-        message: 'Failed to delete entry source',
-        status: 400,
-        stack: err.stack
+        message: err.message || 'Failed to delete entry source',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
       });
     }
   }

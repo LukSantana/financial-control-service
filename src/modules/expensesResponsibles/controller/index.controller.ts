@@ -1,12 +1,11 @@
 import { ExpensesResponsiblesService } from "../service/index.service";
 import { LogsRegistry } from "@src/utils/logsHandling";
 import { PrismaClient } from "@prisma/client";
-import { Controller } from "@src/core/controller";
 import logger from "@src/utils/logger";
-import { type TCrudOperations, type TOperationGeneric } from "@src/core/controller/types";
-import { ExpenseResponsibleDTO } from "../models/index.model";
+import { type TOperationGeneric } from "@src/core/controller/types";
+import { CrudController } from "@src/core/controller/crudController";
 
-export class ExpensesResponsiblesController extends Controller<keyof TCrudOperations> {
+export class ExpensesResponsiblesController extends CrudController {
   constructor(
     private readonly service: ExpensesResponsiblesService,
   ) {
@@ -34,60 +33,60 @@ export class ExpensesResponsiblesController extends Controller<keyof TCrudOperat
         skip,
       }
 
-      const expensesResponsibles: ExpenseResponsibleDTO[] = await this.service.fetchMany(fetchManyArgs);
+      const expensesResponsibles = await this.service.fetchMany(fetchManyArgs);
 
       logger.info('Fetch Expenses Responsibles - Controller - Request finished successfully')
 
-      res.json(expensesResponsibles.map((expenseResponsible) => expenseResponsible.exportToResponse()));
+      res.json(expensesResponsibles);
     } catch (err: any) {
       logger.error(`Fetch Expenses Responsibles - Controller - Error: ${err.message}`)
       this.handleException(err, res);
     }
   }
 
-  protected fetchUnique: TOperationGeneric = async (req, res) => {
+  protected fetchOne: TOperationGeneric = async (req, res) => {
     try {
       logger.info('Fetch ExpenseResponsible Responsible by ID - Controller - Starting request')
 
       const { id } = req.params;
 
-      const fetchUniqueArgs = {
+      const fetchOneArgs = {
         where: { id }
       }
 
-      const expenseResponsible: ExpenseResponsibleDTO = await this.service.fetchUnique(fetchUniqueArgs);
+      const expenseResponsible = await this.service.fetchOne(fetchOneArgs);
 
-      logger.info('Fetch ExpenseResponsible Responsible by ID - Request finished successfully')
+      logger.info('Fetch Expense Responsible Responsible by ID - Request finished successfully')
 
-      res.json(expenseResponsible.exportToResponse());
+      res.json(expenseResponsible);
     } catch (err: any) {
-      logger.error(`Fetch ExpenseResponsible By ID - Controller - Error: ${err.message}`)
+      logger.error(`Fetch Expense Responsible By ID - Controller - Error: ${err.message}`)
       this.handleException(err, res);
     }
   }
 
   protected create: TOperationGeneric = async (req, res) => {
     try {
-      logger.info('Create ExpenseResponsible - Controller - Starting request')
+      logger.info('Create Expense Responsible - Controller - Starting request')
 
       const createArgs = {
         data: req.body
       }
 
-      const expenseResponsible: ExpenseResponsibleDTO = await this.service.create(createArgs);
+      const expenseResponsible = await this.service.create(createArgs);
 
-      logger.info('Create ExpenseResponsible - Controller - Request finished successfully')
+      logger.info('Create Expense Responsible - Controller - Request finished successfully')
 
-      res.json(expenseResponsible.exportToResponse());
+      res.json(expenseResponsible);
     } catch (err: any) {
-      logger.error(`Create ExpenseResponsible - Controller - Error: ${err.message}`)
+      logger.error(`Create Expense Responsible - Controller - Error: ${err.message}`)
       this.handleException(err, res);
     }
   }
 
   protected update: TOperationGeneric = async (req, res) => {
     try {
-      logger.info('Update ExpenseResponsible - Controller - Starting request')
+      logger.info('Update Expense Responsible - Controller - Starting request')
 
       const { id } = req.params;
 
@@ -96,20 +95,20 @@ export class ExpensesResponsiblesController extends Controller<keyof TCrudOperat
         data: req.body,
       }
 
-      const expenseResponsible: ExpenseResponsibleDTO = await this.service.update(updateArgs);
+      const expenseResponsible = await this.service.update(updateArgs);
 
-      logger.info('Update ExpenseResponsible - Controller - Request finished successfully')
+      logger.info('Update Expense Responsible - Controller - Request finished successfully')
 
-      res.json(expenseResponsible.exportToResponse());
+      res.json(expenseResponsible);
     } catch (err: any) {
-      logger.error(`Update ExpenseResponsible - Controller - Error: ${err.message}`)
+      logger.error(`Update Expense Responsible - Controller - Error: ${err.message}`)
       this.handleException(err, res);
     }
   }
 
   protected delete: TOperationGeneric = async (req, res) => {
     try {
-      logger.info('Delete ExpenseResponsible - Starting request')
+      logger.info('Delete Expense Responsible - Starting request')
 
       const { id } = req.params;
 
@@ -117,13 +116,13 @@ export class ExpensesResponsiblesController extends Controller<keyof TCrudOperat
         where: { id }
       }
 
-      const expenseResponsible: ExpenseResponsibleDTO = await this.service.delete(deleteArgs);
+      const expenseResponsible = await this.service.delete(deleteArgs);
 
-      logger.info('Delete ExpenseResponsible - Request finished successfully')
+      logger.info('Delete Expense Responsible - Request finished successfully')
 
-      res.json(expenseResponsible.exportToResponse());
+      res.json(expenseResponsible);
     } catch (err: any) {
-      logger.error(`Update ExpenseResponsible - Controller - Error: ${err.message}`)
+      logger.error(`Update Expense Responsible - Controller - Error: ${err.message}`)
       this.handleException(err, res);
     }
   }

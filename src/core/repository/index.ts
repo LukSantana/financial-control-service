@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import {
   TModelNames,
 } from "../types/prisma";
-import { TFetchMany, TFetchUnique, TCreate, TDelete, TUpdate } from "./types";
+import { TFetchMany, TFetchOne, TCreate, TDelete, TUpdate } from "./types";
 
 export abstract class Repository<M extends TModelNames> {
   constructor(
@@ -13,7 +13,7 @@ export abstract class Repository<M extends TModelNames> {
 
   abstract fetchMany: TFetchMany<M>;
 
-  abstract fetchUnique: TFetchUnique<M>;
+  abstract fetchOne: TFetchOne<M>;
 
   abstract create: TCreate<M>;
 

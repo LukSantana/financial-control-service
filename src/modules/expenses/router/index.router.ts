@@ -19,7 +19,7 @@ const createExpensesRouter = (app: Application) => {
   });
 
   router.get("/expenses/:id", async (req, res) => {
-    await expensesController.execute(req, res, 'fetchUnique');
+    await expensesController.execute(req, res, 'fetchOne');
   });
 
   router.post("/expenses", async (req, res) => {

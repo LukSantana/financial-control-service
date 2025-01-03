@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-export type TCRUDOperationKeys = 'fetchMany' | 'fetchUnique' | 'create' | 'update' | 'delete';
+export type TCRUDOperationKeys = 'fetchMany' | 'fetchOne' | 'create' | 'update' | 'delete';
 export type TAuthOperationKeys = 'login' | 'logout' | 'register';
 export type TOperationsKeys = TCRUDOperationKeys | TAuthOperation;
 

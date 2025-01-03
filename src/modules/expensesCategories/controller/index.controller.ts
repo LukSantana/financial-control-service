@@ -1,12 +1,11 @@
 import { ExpensesCategoriesService } from "../service/index.service";
 import { LogsRegistry } from "@src/utils/logsHandling";
 import { PrismaClient } from "@prisma/client";
-import { Controller } from "@src/core/controller";
 import logger from "@src/utils/logger";
-import { type TCrudOperations, type TOperationGeneric } from "@src/core/controller/types";
-import { ExpenseCategoryDTO } from "../models/index.model";
+import { type TOperationGeneric } from "@src/core/controller/types";
+import { CrudController } from "@src/core/controller/crudController";
 
-export class ExpensesCategoriesController extends Controller<keyof TCrudOperations> {
+export class ExpensesCategoriesController extends CrudController {
   constructor(
     private readonly service: ExpensesCategoriesService,
   ) {
@@ -34,32 +33,32 @@ export class ExpensesCategoriesController extends Controller<keyof TCrudOperatio
         skip,
       }
 
-      const expensesCategories: ExpenseCategoryDTO[] = await this.service.fetchMany(fetchManyArgs);
+      const expensesCategories = await this.service.fetchMany(fetchManyArgs);
 
       logger.info('Fetch Expenses Categories - Controller - Request finished successfully')
 
-      res.json(expensesCategories.map((expenseCategory) => expenseCategory.exportToResponse()));
+      res.json(expensesCategories);
     } catch (err: any) {
       logger.error(`Fetch Expenses Categories - Controller - Error: ${err.message}`)
       this.handleException(err, res);
     }
   }
 
-  protected fetchUnique: TOperationGeneric = async (req, res) => {
+  protected fetchOne: TOperationGeneric = async (req, res) => {
     try {
       logger.info('Fetch Expense Category Category by ID - Controller - Starting request')
 
       const { id } = req.params;
 
-      const fetchUniqueArgs = {
+      const fetchOneArgs = {
         where: { id }
       }
 
-      const expenseCategory: ExpenseCategoryDTO = await this.service.fetchUnique(fetchUniqueArgs);
+      const expenseCategory = await this.service.fetchOne(fetchOneArgs);
 
       logger.info('Fetch Expense Category Category by ID - Request finished successfully')
 
-      res.json(expenseCategory.exportToResponse());
+      res.json(expenseCategory);
     } catch (err: any) {
       logger.error(`Fetch Expense Category By ID - Controller - Error: ${err.message}`)
       this.handleException(err, res);
@@ -74,11 +73,11 @@ export class ExpensesCategoriesController extends Controller<keyof TCrudOperatio
         data: req.body
       }
 
-      const expenseCategory: ExpenseCategoryDTO = await this.service.create(createArgs);
+      const expenseCategory = await this.service.create(createArgs);
 
       logger.info('Create Expense Category - Controller - Request finished successfully')
 
-      res.json(expenseCategory.exportToResponse());
+      res.json(expenseCategory);
     } catch (err: any) {
       logger.error(`Create Expense Category - Controller - Error: ${err.message}`)
       this.handleException(err, res);
@@ -96,11 +95,11 @@ export class ExpensesCategoriesController extends Controller<keyof TCrudOperatio
         data: req.body,
       }
 
-      const expenseCategory: ExpenseCategoryDTO = await this.service.update(updateArgs);
+      const expenseCategory = await this.service.update(updateArgs);
 
       logger.info('Update Expense Category - Controller - Request finished successfully')
 
-      res.json(expenseCategory.exportToResponse());
+      res.json(expenseCategory);
     } catch (err: any) {
       logger.error(`Update Expense Category - Controller - Error: ${err.message}`)
       this.handleException(err, res);
@@ -117,11 +116,11 @@ export class ExpensesCategoriesController extends Controller<keyof TCrudOperatio
         where: { id }
       }
 
-      const expenseCategory: ExpenseCategoryDTO = await this.service.delete(deleteArgs);
+      const expenseCategory = await this.service.delete(deleteArgs);
 
       logger.info('Delete Expense Category - Request finished successfully')
 
-      res.json(expenseCategory.exportToResponse());
+      res.json(expenseCategory);
     } catch (err: any) {
       logger.error(`Update Expense Category - Controller - Error: ${err.message}`)
       this.handleException(err, res);

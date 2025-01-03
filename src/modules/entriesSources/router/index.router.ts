@@ -19,7 +19,7 @@ const createEntriesSourcesRouter = (app: Application) => {
   });
 
   router.get("/entriesSources/:id", async (req, res) => {
-    await entriesSourcesController.execute(req, res, 'fetchUnique');
+    await entriesSourcesController.execute(req, res, 'fetchOne');
   });
 
   router.post("/entriesSources", async (req, res) => {

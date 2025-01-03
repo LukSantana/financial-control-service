@@ -1,12 +1,11 @@
 import { ExpensesService } from "../service/index.service";
 import { LogsRegistry } from "@src/utils/logsHandling";
 import { PrismaClient } from "@prisma/client";
-import { Controller } from "@src/core/controller";
 import logger from "@src/utils/logger";
-import { type TCrudOperations, type TOperationGeneric } from "@src/core/controller/types";
-import { ExpenseDTO } from "../models/index.model";
+import { type TOperationGeneric } from "@src/core/controller/types";
+import { CrudController } from "@src/core/controller/crudController";
 
-export class ExpensesController extends Controller<keyof TCrudOperations> {
+export class ExpensesController extends CrudController {
   constructor(
     private readonly service: ExpensesService,
   ) {
@@ -34,32 +33,32 @@ export class ExpensesController extends Controller<keyof TCrudOperations> {
         skip,
       }
 
-      const expenses: ExpenseDTO[] = await this.service.fetchMany(fetchManyArgs);
+      const expenses = await this.service.fetchMany(fetchManyArgs);
 
       logger.info('Fetch Expenses - Controller - Request finished successfully')
 
-      res.json(expenses.map((expense) => expense.exportToResponse()));
+      res.json(expenses);
     } catch (err: any) {
       logger.error(`Fetch Expenses - Controller - Error: ${err.message}`)
       this.handleException(err, res);
     }
   }
 
-  protected fetchUnique: TOperationGeneric = async (req, res) => {
+  protected fetchOne: TOperationGeneric = async (req, res) => {
     try {
       logger.info('Fetch Expense by ID - Controller - Starting request')
 
-      const { id } = req.params;
+      const id = this.getNumberPathParam(req, 'id');
 
-      const fetchUniqueArgs = {
+      const fetchOneArgs = {
         where: { id }
       }
 
-      const expense: ExpenseDTO = await this.service.fetchUnique(fetchUniqueArgs);
+      const expense = await this.service.fetchOne(fetchOneArgs);
 
       logger.info('Fetch Expense by ID - Request finished successfully')
 
-      res.json(expense.exportToResponse());
+      res.json(expense);
     } catch (err: any) {
       logger.error(`Fetch Expense By ID - Controller - Error: ${err.message}`)
       this.handleException(err, res);
@@ -74,11 +73,11 @@ export class ExpensesController extends Controller<keyof TCrudOperations> {
         data: req.body
       }
 
-      const expense: ExpenseDTO = await this.service.create(createArgs);
+      const expense = await this.service.create(createArgs);
 
       logger.info('Create Expense - Controller - Request finished successfully')
 
-      res.json(expense.exportToResponse());
+      res.json(expense);
     } catch (err: any) {
       logger.error(`Create Expense - Controller - Error: ${err.message}`)
       this.handleException(err, res);
@@ -96,11 +95,11 @@ export class ExpensesController extends Controller<keyof TCrudOperations> {
         data: req.body,
       }
 
-      const expense: ExpenseDTO = await this.service.update(updateArgs);
+      const expense = await this.service.update(updateArgs);
 
       logger.info('Update Expense - Controller - Request finished successfully')
 
-      res.json(expense.exportToResponse());
+      res.json(expense);
     } catch (err: any) {
       logger.error(`Update Expense - Controller - Error: ${err.message}`)
       this.handleException(err, res);
@@ -117,11 +116,11 @@ export class ExpensesController extends Controller<keyof TCrudOperations> {
         where: { id }
       }
 
-      const expense: ExpenseDTO = await this.service.delete(deleteArgs);
+      const expense = await this.service.delete(deleteArgs);
 
       logger.info('Delete Expense - Request finished successfully')
 
-      res.json(expense.exportToResponse());
+      res.json(expense);
     } catch (err: any) {
       logger.error(`Update Expense - Controller - Error: ${err.message}`)
       this.handleException(err, res);

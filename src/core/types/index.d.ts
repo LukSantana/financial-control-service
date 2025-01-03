@@ -5,7 +5,7 @@ export type TFetchMany<
   M extends TModelNames,
 > = (args?: TOperationsArgs<M, 'findMany'>) => Promise<D[]>;
 
-export type TFetchUnique<
+export type TFetchOne<
   D,
   M extends TModelNames,
 > = (args?: TOperationsArgs<M, 'findUnique'>) => Promise<D>;

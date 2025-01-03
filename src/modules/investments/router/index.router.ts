@@ -19,7 +19,7 @@ const createInvestmentsRouter = (app: Application) => {
   });
 
   router.get("/investments/:id", async (req, res) => {
-    await investmentsController.execute(req, res, 'fetchUnique');
+    await investmentsController.execute(req, res, 'fetchOne');
   });
 
   router.post("/investments", async (req, res) => {

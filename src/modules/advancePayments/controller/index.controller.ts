@@ -1,12 +1,11 @@
 import { AdvancePaymentsService } from "../service/index.service";
 import { LogsRegistry } from "@src/utils/logsHandling";
 import { PrismaClient } from "@prisma/client";
-import { Controller } from "@src/core/controller";
 import logger from "@src/utils/logger";
-import { type TCrudOperations, type TOperationGeneric } from "@src/core/controller/types";
-import { AdvancePaymentDTO } from "../models/index.model";
+import { type TOperationGeneric } from "@src/core/controller/types";
+import { CrudController } from "@src/core/controller/crudController";
 
-export class AdvancePaymentsController extends Controller<keyof TCrudOperations> {
+export class AdvancePaymentsController extends CrudController {
   constructor(
     private readonly service: AdvancePaymentsService,
   ) {
@@ -34,32 +33,32 @@ export class AdvancePaymentsController extends Controller<keyof TCrudOperations>
         skip,
       }
 
-      const advancePayments: AdvancePaymentDTO[] = await this.service.fetchMany(fetchManyArgs);
+      const advancePayments = await this.service.fetchMany(fetchManyArgs);
 
       logger.info('Fetch AdvancePayments - Controller - Request finished successfully')
 
-      res.json(advancePayments.map((advancePayment) => advancePayment.exportToResponse()));
+      res.json(advancePayments);
     } catch (err: any) {
       logger.error(`Fetch AdvancePayments - Controller - Error: ${err.message}`)
       this.handleException(err, res);
     }
   }
 
-  protected fetchUnique: TOperationGeneric = async (req, res) => {
+  protected fetchOne: TOperationGeneric = async (req, res) => {
     try {
       logger.info('Fetch AdvancePayment by ID - Controller - Starting request')
 
       const { id } = req.params;
 
-      const fetchUniqueArgs = {
+      const fetchOneArgs = {
         where: { id }
       }
 
-      const advancePayment: AdvancePaymentDTO = await this.service.fetchUnique(fetchUniqueArgs);
+      const advancePayment = await this.service.fetchOne(fetchOneArgs);
 
       logger.info('Fetch AdvancePayment by ID - Request finished successfully')
 
-      res.json(advancePayment.exportToResponse());
+      res.json(advancePayment);
     } catch (err: any) {
       logger.error(`Fetch AdvancePayment By ID - Controller - Error: ${err.message}`)
       this.handleException(err, res);
@@ -74,11 +73,11 @@ export class AdvancePaymentsController extends Controller<keyof TCrudOperations>
         data: req.body
       }
 
-      const advancePayment: AdvancePaymentDTO = await this.service.create(createArgs);
+      const advancePayment = await this.service.create(createArgs);
 
       logger.info('Create AdvancePayment - Controller - Request finished successfully')
 
-      res.json(advancePayment.exportToResponse());
+      res.json(advancePayment);
     } catch (err: any) {
       logger.error(`Create AdvancePayment - Controller - Error: ${err.message}`)
       this.handleException(err, res);
@@ -96,11 +95,11 @@ export class AdvancePaymentsController extends Controller<keyof TCrudOperations>
         data: req.body,
       }
 
-      const advancePayment: AdvancePaymentDTO = await this.service.update(updateArgs);
+      const advancePayment = await this.service.update(updateArgs);
 
       logger.info('Update AdvancePayment - Controller - Request finished successfully')
 
-      res.json(advancePayment.exportToResponse());
+      res.json(advancePayment);
     } catch (err: any) {
       logger.error(`Update AdvancePayment - Controller - Error: ${err.message}`)
       this.handleException(err, res);
@@ -117,11 +116,11 @@ export class AdvancePaymentsController extends Controller<keyof TCrudOperations>
         where: { id }
       }
 
-      const advancePayment: AdvancePaymentDTO = await this.service.delete(deleteArgs);
+      const advancePayment = await this.service.delete(deleteArgs);
 
       logger.info('Delete AdvancePayment - Request finished successfully')
 
-      res.json(advancePayment.exportToResponse());
+      res.json(advancePayment);
     } catch (err: any) {
       logger.error(`Delete AdvancePayment - Controller - Error: ${err.message}`)
       this.handleException(err, res);

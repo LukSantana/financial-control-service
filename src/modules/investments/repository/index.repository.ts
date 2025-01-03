@@ -5,7 +5,7 @@ import {
   type TCreate,
   type TDelete,
   type TFetchMany,
-  type TFetchUnique,
+  type TFetchOne,
   type TUpdate
 } from "@src/core/repository/types";
 import { handleDatabaseError } from "@src/utils/databaseErrorHandling";
@@ -31,7 +31,7 @@ export class InvestmentsRepository extends Repository<"investments"> {
     }
   }
 
-  fetchUnique: TFetchUnique<'investments'> = async (args) => {
+  fetchOne: TFetchOne<'investments'> = async (args) => {
     try {
       logger.info('Fetch Investments - Repository - Fetch unique investment')
       const investment = await this.client.findUnique(args);

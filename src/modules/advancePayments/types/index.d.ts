@@ -1,4 +1,4 @@
-import { type AdvancePaymentDTO } from "../../advancePayments/models/index.model";
+import { AdvancePayments } from "@prisma/client";
 
 export interface IGetAdvancePaymentsProps {
   where?: object;
@@ -7,20 +7,20 @@ export interface IGetAdvancePaymentsProps {
   take?: number;
 }
 
-export type TGetAdvancePayments = (props: IGetAdvancePaymentsProps) => Promise<AdvancePaymentDTO[]>;
+export type TGetAdvancePayments = (props: IGetAdvancePaymentsProps) => Promise<AdvancePayments[]>;
 
 interface IGetExpenseByIdProps {
   id: number;
 }
 
-export type TGetExpenseById = ({ id }: IGetExpenseByIdProps) => Promise<AdvancePaymentDTO>;
+export type TGetExpenseById = ({ id }: IGetExpenseByIdProps) => Promise<AdvancePayments>;
 
 interface ICreateExpenseProps {
-  data: Partial<AdvancePaymentDTO>;
+  data: Partial<AdvancePayments>;
   select?: object;
 }
 
 export type TCreateExpense = ({
   data,
   select
-}: ICreateExpenseProps) => Promise<AdvancePaymentDTO>;
+}: ICreateExpenseProps) => Promise<AdvancePayments>;

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-export type TCRUDOperation = 'fetchMany' | 'fetchUnique' | 'create' | 'update' | 'delete';
+export type TCRUDOperation = 'fetchMany' | 'fetchOne' | 'create' | 'update' | 'delete';
 
 type TOperationGeneric = (req: Request, res: Response) => Promise<void>
 

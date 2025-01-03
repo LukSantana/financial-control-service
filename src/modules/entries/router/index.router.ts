@@ -19,7 +19,7 @@ const createEntriesRouter = (app: Application) => {
   });
 
   router.get("/entries/:id", async (req, res) => {
-    await entriesController.execute(req, res, 'fetchUnique');
+    await entriesController.execute(req, res, 'fetchOne');
   });
 
   router.post("/entries", async (req, res) => {

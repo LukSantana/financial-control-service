@@ -19,7 +19,7 @@ const createExpensesResponsiblesRouter = (app: Application) => {
   });
 
   router.get("/expensesResponsibles/:id", async (req, res) => {
-    await expensesResponsiblesController.execute(req, res, 'fetchUnique');
+    await expensesResponsiblesController.execute(req, res, 'fetchOne');
   });
 
   router.post("/expensesResponsibles", async (req, res) => {

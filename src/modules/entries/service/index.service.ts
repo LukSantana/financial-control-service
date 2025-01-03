@@ -1,20 +1,19 @@
 import assert from "assert";
-import { EntryDTO } from "@src/modules/entries/models/index.model";
 import { HttpError } from "@src/utils/httpError";
 import { Service } from "@src/core/service";
 import {
   type TCreate,
   type TDelete,
   type TFetchMany,
-  type TFetchUnique,
+  type TFetchOne,
   type TUpdate
 } from "@src/core/service/types";
-import { validateData } from "@src/utils/validator";
-import { createEntrySchema, entriesSchema, updateEntrySchema } from "../schema/index.schema";
+import { validate, validateRequiredOperationArgs } from "@src/core/validator"
 import logger from "@src/utils/logger";
+import { entriesDTO } from "../validator/index.validator";
 
-export class EntriesService extends Service<EntryDTO, 'entries'> {
-  fetchMany: TFetchMany<EntryDTO, 'entries'> = async (args) => {
+export class EntriesService extends Service<'entries'> {
+  fetchMany: TFetchMany<'entries'> = async (args) => {
     try {
       logger.info('Fetch Entries - Service - Enter')
 
@@ -40,35 +39,25 @@ export class EntriesService extends Service<EntryDTO, 'entries'> {
         });
       }
 
-      const validatedEntries = entries.map(entry => {
-        const validatedEntry = validateData(entry, entriesSchema);
-        return new EntryDTO(validatedEntry);
-      });
-
       logger.info('Fetch Entries - Service - Exit')
-      return validatedEntries;
+      return entries;
     } catch (err: any) {
       logger.error(`Fetch Entries - Service - Error: ${err.message}`)
       throw new HttpError({
-        message: 'Failed to fetch entries',
-        status: 400,
-        stack: err.stack
+        message: err.message || 'Failed to fetch entries',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  fetchUnique: TFetchUnique<EntryDTO, 'entries'> = async (args) => {
+  fetchOne: TFetchOne<'entries'> = async (args) => {
     try {
       logger.info('Fetch Entry by ID - Service - Enter')
-      if (!args.id) {
-        throw new HttpError({
-          message: 'Entry ID is required',
-          status: 400,
-          stack: new Error().stack!
-        });
-      }
 
-      const entry = await this.repository.fetchUnique(args);
+      validateRequiredOperationArgs({ args, operation: 'findUnique' });
+
+      const entry = await this.repository.fetchOne(args);
 
       if (!entry) {
         throw new HttpError({
@@ -78,37 +67,35 @@ export class EntriesService extends Service<EntryDTO, 'entries'> {
         });
       }
 
-      const validatedEntry = validateData(entry, entriesSchema);
-
       logger.info('Fetch Entry by ID - Service - Exit')
-      return new EntryDTO(validatedEntry);
+
+      return entry;
     } catch (err: any) {
       logger.error(`Fetch Entry by ID - Service - Error: ${err.message}`)
       throw new HttpError({
-        message: 'Failed to fetch entry',
-        status: 400,
-        stack: err.stack
+        message: err.message || 'Failed to fetch entry',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
       });
     }
   }
 
-  create: TCreate<EntryDTO, 'entries'> = async (args) => {
+  create: TCreate<'entries'> = async (args) => {
     try {
       logger.info('Create Entry - Service - Enter');
-      assert(args.data, 'Entry data is required');
+      validateRequiredOperationArgs({
+        args,
+        operation: 'create'
+      })
 
       const entryData = args.data;
 
-      const { error } = createEntrySchema.validate(entryData, { abortEarly: false });
-
-      if (error) {
-        logger.error(`Create Entry - Invalid data: ${error.message}`);
-        throw new HttpError({
-          message: `Invalid data: ${error.message}`,
-          status: 400,
-          stack: new Error().stack!
-        });
-      }
+      validate({
+        operation: 'create',
+        modelName: 'entries',
+        data: entryData,
+        DTO: entriesDTO
+      })
 
       const createdEntry = await this.repository.create(args);
 
@@ -120,38 +107,35 @@ export class EntriesService extends Service<EntryDTO, 'entries'> {
         });
       }
 
-      const validatedEntry = validateData(createdEntry, entriesSchema);
-
       logger.info('Create Entry - Service - Exit');
-      return new EntryDTO(validatedEntry);
+      return createdEntry;
     } catch (err: any) {
       logger.error(`Create Entry - Service - Error: ${err.message}`);
       throw new HttpError({
-        message: 'Failed to create entry',
-        status: 400,
-        stack: err.stack
-      })
+        message: err.message || 'Failed to create entry',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
+      });
     }
   }
 
-  update: TUpdate<EntryDTO, 'entries'> = async (args) => {
+  update: TUpdate<'entries'> = async (args) => {
     try {
       logger.info('Update Entry - Service - Enter');
 
-      assert(args.data, 'Entry data is required');
-      assert(args.where, 'Entry ID is required');
+      validateRequiredOperationArgs({
+        args,
+        operation: 'update'
+      })
 
       const entryData = args.data;
 
-      const { error } = updateEntrySchema.validate(entryData, { abortEarly: false });
-
-      if (error) {
-        throw new HttpError({
-          message: `Invalid data: ${error.message}`,
-          status: 400,
-          stack: new Error().stack!
-        });
-      }
+      validate({
+        operation: 'update',
+        modelName: 'entries',
+        data: entryData,
+        DTO: entriesDTO
+      })
 
       const updatedEntry = await this.repository.update(args);
 
@@ -163,24 +147,25 @@ export class EntriesService extends Service<EntryDTO, 'entries'> {
         });
       }
 
-      const validatedEntry = validateData(updatedEntry, entriesSchema);
-
       logger.info('Update Entry - Service - Exit');
-      return new EntryDTO(validatedEntry);
+      return updatedEntry;
     } catch (err: any) {
       logger.error(`Update Entry - Service - Error: ${err.message}`);
       throw new HttpError({
-        message: 'Failed to update entry',
-        status: 400,
-        stack: err.stack
-      })
+        message: err.message || 'Failed to update entry',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
+      });
     }
   }
 
-  delete: TDelete<EntryDTO, 'entries'> = async (args) => {
+  delete: TDelete<'entries'> = async (args) => {
     try {
       logger.info('Delete Entry - Service - Enter');
-      assert(args.where.id, 'Entry ID is required');
+      validateRequiredOperationArgs({
+        args,
+        operation: 'delete'
+      })
 
       const deletedEntry = await this.repository.delete(args);
 
@@ -192,16 +177,14 @@ export class EntriesService extends Service<EntryDTO, 'entries'> {
         });
       }
 
-      const validatedEntry = validateData(deletedEntry, entriesSchema);
-
       logger.info('Delete Entry - Service - Exit');
-      return new EntryDTO(validatedEntry);
+      return deletedEntry;
     } catch (err: any) {
       logger.error(`Delete Entry - Service - Error: ${err.message}`);
       throw new HttpError({
-        message: 'Failed to delete entry',
-        status: 400,
-        stack: err.stack
+        message: err.message || 'Failed to delete entry',
+        status: err.status || 400,
+        stack: err.stack || new Error().stack!
       });
     }
   }
